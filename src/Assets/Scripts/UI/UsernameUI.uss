@@ -1,0 +1,11 @@
+.button-save {
+    width: 420px;
+}
+
+.title-label {
+    position: absolute;
+    top: 5%;
+    font-size: 20px;
+    color: rgb(28, 28, 28);
+    -unity-text-outline-width: -1px;
+}

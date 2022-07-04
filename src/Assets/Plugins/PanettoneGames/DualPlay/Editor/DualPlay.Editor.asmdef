@@ -1,0 +1,18 @@
+{
+    "name": "DualPlay.Editor",
+    "rootNamespace": "",
+    "references": [
+        "GUID:4e0a1a3e4fd9557479b576ebb400fa54"
+    ],
+    "includePlatforms": [
+        "Editor"
+    ],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": true,
+    "defineConstraints": [],
+    "versionDefines": [],
+    "noEngineReferences": false
+}
