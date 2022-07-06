@@ -9,16 +9,15 @@ namespace Game.CodeBase.Infrastructure.Network
 {
     public class AdvancedNetworkManager : NetworkManager
     {
-        [Header("Base information")]
-        public int MinConnections = 2;
+        [Header("Base information")] public int MinConnections = 2;
         [Scene] public string CurrentScene = string.Empty;
-    
+
         public bool ConnectToAvailableServerAutomatically = false;
-    
+
         public BasePlayer[] Players { get; } = new BasePlayer[4];
 
         private IImplementator _implementator;
-    
+
         //TODO: Идея новой системы в том, что в ней есть стейт машина, которая дает приказы network manager'у, чтобы тот переключил IUtility и мб еще что-то
         //TODO: а объект IUtility занимается настройкой взаимосвязей между компонентами на сцене, спавном префабов в нужной последовательности в нужных местах, перестройкой ивентов (к слову, нужно сделать все ивенты под основные метды, по типу OnClientConnected и т.д. либо прокинуть методы)
         //TODO: кстати о прокидовани методов. можно же сделать расширение интерфейсов под нужды, например, IUtilityConnections, IUtilitySpawner
@@ -27,15 +26,22 @@ namespace Game.CodeBase.Infrastructure.Network
         //TODO: и если у него получится, то можно привязать ивент и всё хорошо
         //TODO: у стейта должен быть выход, чтобы перестроить со старого стейта связи в новый (как это было в видео, когда у NetworkServer меняли привязку к префабам)
         //TODO: еще есть мысль сделать объекты IUtility NetworkBehaviour, чтобы они были у всех и делали свои вещи как на стороне клиента, так и на стороне сервера
-    
+
         //TODO: NetworkManager создает StateMachine, которая им в дальнейшем будет управлять
         //TODO: пока что стейт машина начинает свой пут с LobbyUtility
 
-        public Action<NetworkConnection> OnClientConnected;
-        public Action<NetworkConnection> OnClientDisconnected;
-        public Action<NetworkConnectionToClient> OnClientConnectedOnServerSide;
-        public Action<NetworkConnectionToClient> OnClientDisconnectedOnServerSide;
-        public Action<NetworkConnectionToClient> OnServerAddedPlayer;
+        public event Action<NetworkConnection> OnClientConnected;
+        public event Action<NetworkConnection> OnClientDisconnected;
+        public event Action<NetworkConnectionToClient> OnClientConnectedOnServerSide;
+        public event Action<NetworkConnectionToClient> OnClientDisconnectedOnServerSide;
+        public event Action<NetworkConnectionToClient> OnServerAddedPlayer;
+
+        public void SetImplementator(IImplementator implementator)
+        {
+            _implementator = implementator;
+            CurrentScene = _implementator.Scene;
+            _implementator.Setup();
+        }
 
         public override void OnStartServer()
         {
@@ -52,20 +58,43 @@ namespace Game.CodeBase.Infrastructure.Network
             }
         }
 
+        public override void OnStopServer()
+        {
+            foreach (var player in Players)
+            {
+                //if (player != null) player.Destroy();
+            }
+        }
+
+        /// <summary>
+        /// Called on the client when connected to a server.
+        /// <para>The default implementation of this function sets the client as ready and adds a player. Override the function to dictate what happens when the client connects.</para>
+        /// </summary>
+        /// <param name="conn">Connection to the server.</param>
         public override void OnClientConnect(NetworkConnection conn)
         {
             base.OnClientConnect(conn);
-        
+
             OnClientConnected?.Invoke(conn);
         }
 
+        /// <summary>
+        /// Called on clients when disconnected from a server.
+        /// <para>This is called on the client when it disconnects from the server. Override this function to decide what happens when the client disconnects.</para>
+        /// </summary>
+        /// <param name="conn">Connection to the server.</param>
         public override void OnClientDisconnect(NetworkConnection conn)
         {
             base.OnClientDisconnect(conn);
-        
+
             OnClientDisconnected?.Invoke(conn);
         }
 
+        /// <summary>
+        /// Called on the server when a new client connects.
+        /// <para>Unity calls this on the Server when a Client connects to the Server. Use an override to tell the NetworkManager what to do when a client connects to the server.</para>
+        /// </summary>
+        /// <param name="conn">Connection from client.</param>
         public override void OnServerConnect(NetworkConnectionToClient conn)
         {
             if (numPlayers > maxConnections)
@@ -77,12 +106,22 @@ namespace Game.CodeBase.Infrastructure.Network
             OnClientConnectedOnServerSide?.Invoke(conn);
         }
 
+        /// <summary>
+        /// Called on the server when a client disconnects.
+        /// <para>This is called on the Server when a Client disconnects from the Server. Use an override to decide what should happen when a disconnection is detected.</para>
+        /// </summary>
+        /// <param name="conn">Connection from client.</param>
         public override void OnServerDisconnect(NetworkConnectionToClient conn)
         {
             OnClientDisconnectedOnServerSide?.Invoke(conn);
             base.OnServerDisconnect(conn);
         }
 
+        /// <summary>
+        /// Called on the server when a client adds a new player with ClientScene.AddPlayer.
+        /// <para>The default implementation for this function creates a new player object from the playerPrefab.</para>
+        /// </summary>
+        /// <param name="conn">Connection from client.</param>
         public override void OnServerAddPlayer(NetworkConnectionToClient conn)
         {
             int availableId = GetAvailableId();
@@ -96,21 +135,6 @@ namespace Game.CodeBase.Infrastructure.Network
             }
         }
 
-        public override void OnStopServer()
-        {
-            foreach (var player in Players)
-            {
-                //if (player != null) player.Destroy();
-            }
-        }
-
-        public void SetImplementator(IImplementator implementator)
-        {
-            _implementator = implementator;
-            CurrentScene = _implementator.Scene;
-            _implementator.Setup();
-        }
-
         public int GetAvailableId()
         {
             for (int i = 0; i < 4; i++)
@@ -119,9 +143,116 @@ namespace Game.CodeBase.Infrastructure.Network
                     return i;
             }
 
-        
+
             Debug.Log("Its not empty!");
             return -1;
         }
+
+        public override void OnStopClient()
+        {
+            base.OnStopClient();
+        }
+
+        #region Scene management
+
+        /// <summary>
+        /// This causes the server to switch scenes and sets the networkSceneName.
+        /// <para>Clients that connect to this server will automatically switch to this scene. This is called automatically if onlineScene or offlineScene are set, but it can be called from user code to switch scenes again while the game is in progress. This automatically sets clients to be not-ready. The clients must call NetworkClient.Ready() again to participate in the new scene.</para>
+        /// </summary>
+        /// <param name="newSceneName"></param>
+        public override void ServerChangeScene(string newSceneName)
+        {
+            base.ServerChangeScene(newSceneName);
+        }
+
+
+        /// <summary>
+        /// Called from ServerChangeScene immediately before SceneManager.LoadSceneAsync is executed
+        /// <para>This allows server to do work / cleanup / prep before the scene changes.</para>
+        /// </summary>
+        /// <param name="newSceneName">Name of the scene that's about to be loaded</param>
+        public override void OnServerChangeScene(string newSceneName)
+        {
+            base.OnServerChangeScene(newSceneName);
+        }
+
+        /// <summary>
+        /// Called on the server when a scene is completed loaded, when the scene load was initiated by the server with ServerChangeScene().
+        /// </summary>
+        /// <param name="sceneName">The name of the new scene.</param>
+        public override void OnServerSceneChanged(string sceneName)
+        {
+            base.OnServerSceneChanged(sceneName);
+        }
+
+        /// <summary>
+        /// Called from ClientChangeScene immediately before SceneManager.LoadSceneAsync is executed
+        /// <para>This allows client to do work / cleanup / prep before the scene changes.</para>
+        /// </summary>
+        /// <param name="newSceneName">Name of the scene that's about to be loaded</param>
+        /// <param name="sceneOperation">Scene operation that's about to happen</param>
+        /// <param name="customHandling">true to indicate that scene loading will be handled through overrides</param>
+        public override void OnClientChangeScene(string newSceneName, SceneOperation sceneOperation, bool customHandling)
+        {
+            base.OnClientChangeScene(newSceneName, sceneOperation, customHandling);
+        }
+
+        /// <summary>
+        /// Called on clients when a scene has completed loaded, when the scene load was initiated by the server.
+        /// <para>Scene changes can cause player objects to be destroyed. The default implementation of OnClientSceneChanged in the NetworkManager is to add a player object for the connection if no player object exists.</para>
+        /// </summary>
+        public override void OnClientSceneChanged()
+        {
+            base.OnClientSceneChanged();
+        }
+
+        #endregion
+
+        #region Server System Callbacks
+
+        /// <summary>
+        /// Called on the server when a client is ready.
+        /// <para>The default implementation of this function calls NetworkServer.SetClientReady() to continue the network setup process.</para>
+        /// </summary>
+        /// <param name="conn">Connection from client.</param>
+        public override void OnServerReady(NetworkConnectionToClient conn)
+        {
+            base.OnServerReady(conn);
+        }
+
+        /// <summary>
+        /// Called on the server when a network error occurs for a client connection.
+        /// </summary>
+        /// <param name="conn">Connection from client.</param>
+        /// <param name="exception">Error</param>
+        public override void OnServerError(NetworkConnectionToClient conn, Exception exception)
+        {
+            base.OnServerError(conn, exception);
+        }
+
+        #endregion
+
+        #region Client System Callbacks
+
+        /// <summary>
+        /// Called on clients when a network error occurs.
+        /// </summary>
+        /// <param name="exception">Error</param>
+        public override void OnClientError(Exception exception)
+        {
+            base.OnClientError(exception);
+        }
+
+        /// <summary>
+        /// Called on clients when a servers tells the client it is no longer ready.
+        /// <para>This is commonly used when switching scenes.</para>
+        /// </summary>
+        public override void OnClientNotReady()
+        {
+            base.OnClientNotReady();
+        }
+        #endregion
+        
+        
     }
 }
