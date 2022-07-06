@@ -11,7 +11,7 @@ namespace Game.CodeBase.Infrastructure.States
             private Dictionary<Type, IExitableState> _states;
             private IExitableState _activeState;
 
-            public GameStateMachine(IEnumerable<IExitableState> states)
+            public void SetStates(IEnumerable<IExitableState> states)
             {
                 _states = states.ToDictionary(state => state.GetType(), state => state);
             }

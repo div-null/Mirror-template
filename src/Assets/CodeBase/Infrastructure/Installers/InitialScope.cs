@@ -1,5 +1,7 @@
 ﻿using Game.CodeBase.Infrastructure.States;
+using Game.CodeBase.Services;
 using Game.CodeBase.Services.Network;
+using Mirror;
 using UnityEngine;
 using VContainer;
 using VContainer.Unity;
@@ -12,28 +14,35 @@ namespace Game.CodeBase.Infrastructure.Installers
 
         class EntryPoint : IStartable
         {
-            private readonly IGameStateMachine _gameStateMachine;
+            private InitialScope _scope;
 
-            public EntryPoint(IGameStateMachine gameStateMachine)
+            public EntryPoint(InitialScope scope)
             {
-                _gameStateMachine = gameStateMachine;
+                _scope = scope;
             }
 
             public void Start()
             {
-                _gameStateMachine.Enter<BootstrapState>();
+                LifetimeScope lifetimeScope = _scope.CreateChild(new GameStateMachineInstaller());
+
+                var gameStateMachine = lifetimeScope.Container.Resolve<IGameStateMachine>();
+                var progressData = lifetimeScope.Container.Resolve<PlayerProgressData>();
+
+                progressData.Load();
+                gameStateMachine.Enter<BootstrapState>();
             }
         }
 
         protected override void Configure(IContainerBuilder builder)
         {
-            builder.RegisterEntryPoint<EntryPoint>();
-            builder.Register<MainInputActions>(Lifetime.Singleton);
+            builder.RegisterComponentInNewPrefab(_advancedNetworkManagerPrefab, Lifetime.Singleton)
+                .As<ICoroutineRunner>()
+                .As<NetworkManager>()
+                .AsSelf();
+            builder.Register<SceneLoader>(Lifetime.Singleton);
             builder.Register<PlayerProgressData>(Lifetime.Singleton);
-
-            LifetimeScope stateMachineScope = CreateChild(new GameStateMachineInstaller());
-            var gameStateMachine = stateMachineScope.Container.Resolve<IGameStateMachine>();
-            builder.Register(_ => gameStateMachine, Lifetime.Singleton);
+            builder.Register<MainInputActions>(Lifetime.Singleton);
+            builder.RegisterEntryPoint<EntryPoint>();
         }
     }
 }

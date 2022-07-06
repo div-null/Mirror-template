@@ -1,6 +1,7 @@
 using System;
 using System.Linq;
 using Game.CodeBase.Implementations;
+using Game.CodeBase.Infrastructure;
 using Game.CodeBase.Player;
 using Mirror;
 using UnityEngine;
@@ -8,7 +9,7 @@ using UnityEngine.SceneManagement;
 
 namespace Game.CodeBase.Services.Network
 {
-    public class AdvancedNetworkManager : NetworkManager
+    public class AdvancedNetworkManager : NetworkManager, ICoroutineRunner
     {
         [Header("Base information")] public int MinConnections = 2;
         [Scene] public string CurrentScene = string.Empty;

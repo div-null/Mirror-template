@@ -38,7 +38,7 @@ RenderSettings:
   m_ReflectionIntensity: 1
   m_CustomReflection: {fileID: 0}
   m_Sun: {fileID: 0}
-  m_IndirectSpecularColor: {r: 0.18028378, g: 0.22571412, b: 0.30692285, a: 1}
+  m_IndirectSpecularColor: {r: 0.44657844, g: 0.49641222, b: 0.57481694, a: 1}
   m_UseRadianceAmbientProbe: 0
 --- !u!157 &3
 LightmapSettings:
@@ -250,7 +250,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 1377694258}
-  - component: {fileID: 1377694257}
+  - component: {fileID: 1377694259}
   m_Layer: 0
   m_Name: Bootstrapper
   m_TagString: Untagged
@@ -258,20 +258,6 @@ GameObject:
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 1
---- !u!114 &1377694257
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1377694256}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: e946a0fc5c4ceee42ae6a2f0a909f55c, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  _advancedNetworkManagerPrefab: {fileID: 8025365793126965172, guid: a8c3a12b079baec4ca913698d9404d7e,
-    type: 3}
 --- !u!4 &1377694258
 Transform:
   m_ObjectHideFlags: 0
@@ -287,6 +273,23 @@ Transform:
   m_Father: {fileID: 0}
   m_RootOrder: 2
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &1377694259
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1377694256}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7406e7ac3e4444d7a64e6a5d34f551db, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  parentReference:
+    TypeName: 
+  autoRun: 1
+  autoInjectGameObjects: []
+  _advancedNetworkManagerPrefab: {fileID: 8025365793126965172, guid: a8c3a12b079baec4ca913698d9404d7e, type: 3}
 --- !u!1 &2067441660
 GameObject:
   m_ObjectHideFlags: 0
