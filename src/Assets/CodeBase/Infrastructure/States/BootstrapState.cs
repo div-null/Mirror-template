@@ -1,7 +1,6 @@
-﻿using Game.CodeBase.Infrastructure;
-using Game.CodeBase.States.CodeBase.Infrastructure.States;
+﻿using Game.CodeBase.Infrastructure.States.CodeBase.Infrastructure.States;
 
-namespace Game.CodeBase.States
+namespace Game.CodeBase.Infrastructure.States
 {
     public class BootstrapState : IState
     {
@@ -9,18 +8,11 @@ namespace Game.CodeBase.States
         private readonly GameStateMachine _stateMachine;
         private readonly SceneLoader _sceneLoader;
 
-        public BootstrapState(GameStateMachine gameStateMachine, SceneLoader sceneLoader)
+        public BootstrapState(GameStateMachine gameStateMachine, SceneLoader sceneLoader, MainInputActions inputs)
         {
             _stateMachine = gameStateMachine;
             _sceneLoader = sceneLoader;
-            
-            //Init inputs
-            MainInputActions mainInputActions = new MainInputActions();
-            mainInputActions.Enable();
-            AllServices.MainInputActions = mainInputActions;
-            //Init progress
-            PlayerProgressData playerProgressData = new PlayerProgressData();
-            AllServices.PlayerProgressData = playerProgressData;
+            inputs.Enable();
         }
 
         public void Enter()

@@ -1,7 +1,7 @@
 ﻿using System;
 using Game.CodeBase.Data;
-using Game.CodeBase.Infrastructure;
 using Mirror;
+using VContainer;
 
 namespace Game.CodeBase.Player
 {
@@ -14,10 +14,18 @@ namespace Game.CodeBase.Player
         public int Id;
         public bool IsOnline;
 
-        public Action<int, string> UsernameChanged;
-        public Action<ColorType> ColorChanged;
-        public Action Destroyed;
+        public event Action<int, string> UsernameChanged;
+        public event Action<ColorType> ColorChanged;
+        public event Action Destroyed;
+        
+        private PlayerProgress _playerProgress;
 
+        [Inject]
+        public void Initialize(PlayerProgress playerProgress)
+        {
+            _playerProgress = playerProgress;
+        }
+        
         [Command]
         public void CmdChangeUsername(string username)
         {
@@ -46,7 +54,7 @@ namespace Game.CodeBase.Player
 
         public override void OnStartAuthority()
         {
-            CmdChangeUsername(AllServices.PlayerProgressData.Username);
+            CmdChangeUsername(_playerProgress.Username);
         }
 
         [Command]
