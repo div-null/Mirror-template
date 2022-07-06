@@ -1,6 +1,6 @@
 ﻿using Random = UnityEngine.Random;
 
-namespace Data
+namespace Game.CodeBase.Data
 {
     public class PlayerProgress
     {

@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace Data
+namespace Game.CodeBase.Data
 {
     [Serializable]
     public class ColorData

@@ -1,4 +1,4 @@
-﻿namespace CodeBase.States
+﻿namespace Game.CodeBase.States
 {
     public interface IState : IExitableState
     {

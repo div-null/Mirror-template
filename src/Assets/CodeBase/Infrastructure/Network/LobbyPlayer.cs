@@ -1,8 +1,9 @@
 ﻿using System;
+using Game.CodeBase.Implementations;
+using Game.CodeBase.UI;
 using Mirror;
-using UnityEngine;
 
-namespace CodeBase.Infrastructure.Network
+namespace Game.CodeBase.Infrastructure.Network
 {
     public class LobbyPlayer : NetworkBehaviour
     {

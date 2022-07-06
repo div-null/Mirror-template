@@ -1,9 +1,8 @@
 ﻿using System;
-using CodeBase.Infrastructure;
+using Game.CodeBase.Infrastructure;
 using Mirror;
-using UnityEngine;
 
-namespace CodeBase
+namespace Game.CodeBase
 {
     public class BasePlayer : NetworkBehaviour
     {

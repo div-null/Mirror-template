@@ -1,14 +1,14 @@
-﻿using System.Collections;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
-using CodeBase.Infrastructure;
-using CodeBase.Infrastructure.CodeBase.Infrastructure.States;
+using Game.CodeBase.Implementations;
+using Game.CodeBase.Infrastructure.Network;
+using Game.CodeBase.States.CodeBase.Infrastructure.States;
 using kcp2k;
 using Mirror;
 using Mirror.Discovery;
 using UnityEngine;
 
-namespace CodeBase.States
+namespace Game.CodeBase.States
 {
     public class PrepareLobbyState : IState
     {

@@ -1,22 +1,18 @@
-using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 
-public class ColorPickerUI : MonoBehaviour
+namespace Game.CodeBase.UI
 {
-    private Dictionary<ColorType, Button> _colorPickerButtons;
-
-    // Start is called before the first frame update
-    void Start()
+    public class ColorPickerUI : MonoBehaviour
     {
-        _colorPickerButtons = new Dictionary<ColorType, Button>();
-        
-    }
+        private Dictionary<ColorType, Button> _colorPickerButtons;
 
-    // Update is called once per frame
-    void Update()
-    {
+        // Start is called before the first frame update
+        void Start()
+        {
+            _colorPickerButtons = new Dictionary<ColorType, Button>();
         
+        }
     }
 }

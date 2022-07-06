@@ -1,4 +1,4 @@
-﻿namespace CodeBase
+﻿namespace Game.CodeBase
 {
     public class GameJudger
     {

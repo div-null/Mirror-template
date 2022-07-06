@@ -1,6 +1,7 @@
-﻿using CodeBase.States;
+﻿using Game.CodeBase.Infrastructure;
+using Game.CodeBase.States.CodeBase.Infrastructure.States;
 
-namespace CodeBase.Infrastructure.CodeBase.Infrastructure.States
+namespace Game.CodeBase.States
 {
     public class BootstrapState : IState
     {

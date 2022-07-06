@@ -1,8 +1,8 @@
-﻿using CodeBase.Infrastructure;
-using CodeBase.Infrastructure.CodeBase.Infrastructure.States;
+﻿using Game.CodeBase.Infrastructure;
+using Game.CodeBase.States.CodeBase.Infrastructure.States;
 using Mirror;
 
-namespace CodeBase.States
+namespace Game.CodeBase.States
 {
     public class HotPotatoState : IState
     {

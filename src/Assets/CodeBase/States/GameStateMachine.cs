@@ -1,9 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
-using CodeBase.States;
-using Mirror;
+using Game.CodeBase.Infrastructure;
+using Game.CodeBase.Infrastructure.Network;
 
-namespace CodeBase.Infrastructure
+namespace Game.CodeBase.States
 {
     namespace CodeBase.Infrastructure.States
     {

@@ -1,4 +1,4 @@
-﻿namespace CodeBase.Infrastructure
+﻿namespace Game.CodeBase.Infrastructure
 {
     public class AllServices
     {

@@ -1,7 +1,6 @@
 ﻿using System;
-using System.Collections.Generic;
 
-namespace Data
+namespace Game.CodeBase.Data
 {
     [Serializable]
     public class ItemsData

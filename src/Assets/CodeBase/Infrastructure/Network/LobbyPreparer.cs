@@ -1,67 +1,67 @@
-using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
-using System.Net;
 using kcp2k;
 using Mirror;
 using Mirror.Discovery;
 using UnityEngine;
 
-public class LobbyPreparer : MonoBehaviour
+namespace Game.CodeBase.Infrastructure.Network
 {
-    public bool ConnectToAvailableServerAutomatically = false;
+    public class LobbyPreparer : MonoBehaviour
+    {
+        public bool ConnectToAvailableServerAutomatically = false;
         
-    [SerializeField] private ServersObserver _serversObserver;
+        [SerializeField] private ServersObserver _serversObserver;
 
-    private void Awake()
-    {
-        _serversObserver.FoundServers += JoinOrHost;
-    }
-
-    private void JoinOrHost(Dictionary<long, ServerResponse> foundServers)
-    {
-        if (foundServers.Count == 0)
+        private void Awake()
         {
-            NetworkManager.singleton.StartHost();
+            _serversObserver.FoundServers += JoinOrHost;
         }
-        else
+
+        private void JoinOrHost(Dictionary<long, ServerResponse> foundServers)
         {
-            if (ConnectToAvailableServerAutomatically)
+            if (foundServers.Count == 0)
             {
-                //TODO: Change response information to find out if the server is available
-                var firstServerInfo = foundServers.First().Value;
-                NetworkManager.singleton.StartClient(firstServerInfo.uri);
+                NetworkManager.singleton.StartHost();
             }
             else
             {
-                ushort newPort = FindEmptyPort(foundServers);
-                NetworkManager.singleton.gameObject.GetComponent<KcpTransport>().Port = newPort;
-                NetworkManager.singleton.StartHost();
-            }
-        }
-    }
-
-    private ushort FindEmptyPort(Dictionary<long, ServerResponse> foundServers)
-    {
-        string myIp = NetworkManager.singleton.networkAddress;
-        ushort myPort = 7777;
-        bool isUnique = false;
-        while (!isUnique)
-        {
-            foreach (var server in foundServers)
-            {
-                if (server.Value.EndPoint.Address.ToString() == myIp && server.Value.uri.Port == myPort)
+                if (ConnectToAvailableServerAutomatically)
                 {
-                    isUnique = false;
-                    myPort++;
-                    break;
+                    //TODO: Change response information to find out if the server is available
+                    var firstServerInfo = foundServers.First().Value;
+                    NetworkManager.singleton.StartClient(firstServerInfo.uri);
+                }
+                else
+                {
+                    ushort newPort = FindEmptyPort(foundServers);
+                    NetworkManager.singleton.gameObject.GetComponent<KcpTransport>().Port = newPort;
+                    NetworkManager.singleton.StartHost();
                 }
             }
-
-            isUnique = true;
         }
 
-        return myPort;
+        private ushort FindEmptyPort(Dictionary<long, ServerResponse> foundServers)
+        {
+            string myIp = NetworkManager.singleton.networkAddress;
+            ushort myPort = 7777;
+            bool isUnique = false;
+            while (!isUnique)
+            {
+                foreach (var server in foundServers)
+                {
+                    if (server.Value.EndPoint.Address.ToString() == myIp && server.Value.uri.Port == myPort)
+                    {
+                        isUnique = false;
+                        myPort++;
+                        break;
+                    }
+                }
+
+                isUnique = true;
+            }
+
+            return myPort;
+        }
     }
 }
