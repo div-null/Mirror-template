@@ -16,11 +16,11 @@ namespace Game.CodeBase.Infrastructure.States
         private readonly AdvancedNetworkManager _advancedNetworkManager;
         private readonly ServersObserver _serversObserver;
         
-        public PrepareLobbyState(GameStateMachine gameStateMachine, AdvancedNetworkManager advancedNetworkManager)
+        public PrepareLobbyState(GameStateMachine gameStateMachine, AdvancedNetworkManager advancedNetworkManager, ServersObserver serversObserver)
         {
             _stateMachine = gameStateMachine;
             _advancedNetworkManager = advancedNetworkManager;
-            _serversObserver = _advancedNetworkManager.gameObject.GetComponent<ServersObserver>();
+            _serversObserver = serversObserver;
             _serversObserver.FoundServers += JoinOrHost;
         }
 

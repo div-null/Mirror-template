@@ -2,6 +2,7 @@
 using Game.CodeBase.Services;
 using Game.CodeBase.Services.Network;
 using Mirror;
+using Mirror.Discovery;
 using UnityEngine;
 using VContainer;
 using VContainer.Unity;
@@ -35,14 +36,24 @@ namespace Game.CodeBase.Infrastructure.Installers
 
         protected override void Configure(IContainerBuilder builder)
         {
-            builder.RegisterComponentInNewPrefab(_advancedNetworkManagerPrefab, Lifetime.Singleton)
-                .As<ICoroutineRunner>()
-                .As<NetworkManager>()
-                .AsSelf();
+            builder.Register<ServersObserver>(Lifetime.Singleton);
             builder.Register<SceneLoader>(Lifetime.Singleton);
             builder.Register<PlayerProgressData>(Lifetime.Singleton);
             builder.Register<MainInputActions>(Lifetime.Singleton);
             builder.RegisterEntryPoint<EntryPoint>();
+            
+            AdvancedNetworkManager networkManager = Instantiate(_advancedNetworkManagerPrefab);
+            
+            builder.UseComponents(components =>
+            {
+                components.AddInstance(networkManager)
+                    .As<ICoroutineRunner>()
+                    .As<NetworkManager>()
+                    .AsSelf();
+
+                components.AddInstance(networkManager.GetComponent<NetworkDiscovery>());
+            });
+            
         }
     }
 }
