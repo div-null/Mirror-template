@@ -1,20 +1,26 @@
 using Mirror;
 using UnityEngine;
 
-namespace Game.CodeBase
+namespace Game.CodeBase.Player
 {
-    public class CharacterMovement : NetworkBehaviour
+    public class ClientCharacterMovement : NetworkBehaviour
     {
         [SerializeField] private CharacterController _characterController;
         [SerializeField] private Animator _animator;
-        
+
+        private void Start()
+        {
+            // if (hasAuthority)
+            //     InputListener.Instance.Move += Move;
+        }
 
         private void Move(Vector2 inputVector)
         {
             if (inputVector != Vector2.zero)
             {
                 Vector3 moveDirection = new Vector3(inputVector.x, 0, inputVector.y);
-                MoveCommand(moveDirection);
+                this.transform.forward = moveDirection.normalized;
+                _characterController.Move(moveDirection / 20);
             }
         }
 

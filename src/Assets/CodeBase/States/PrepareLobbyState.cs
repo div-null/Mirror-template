@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 using Game.CodeBase.Implementations;
-using Game.CodeBase.Infrastructure.Network;
+using Game.CodeBase.Services.Network;
 using Game.CodeBase.States.CodeBase.Infrastructure.States;
 using kcp2k;
 using Mirror;

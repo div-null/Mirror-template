@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using Game.CodeBase.Infrastructure;
-using Game.CodeBase.Infrastructure.Network;
+using Game.CodeBase.Services.Network;
 
 namespace Game.CodeBase.States
 {

@@ -1,5 +1,6 @@
 using System;
-using Game.CodeBase.Infrastructure.Network;
+using Game.CodeBase.Player;
+using Game.CodeBase.Services.Network;
 using Game.CodeBase.UI;
 using Mirror;
 using UnityEngine;

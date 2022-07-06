@@ -1,9 +1,10 @@
 ﻿using System;
 using Game.CodeBase.Implementations;
+using Game.CodeBase.Player;
 using Game.CodeBase.UI;
 using Mirror;
 
-namespace Game.CodeBase.Infrastructure.Network
+namespace Game.CodeBase.Services.Network
 {
     public class LobbyPlayer : NetworkBehaviour
     {

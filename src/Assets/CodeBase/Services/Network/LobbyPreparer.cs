@@ -5,7 +5,7 @@ using Mirror;
 using Mirror.Discovery;
 using UnityEngine;
 
-namespace Game.CodeBase.Infrastructure.Network
+namespace Game.CodeBase.Services.Network
 {
     public class LobbyPreparer : MonoBehaviour
     {

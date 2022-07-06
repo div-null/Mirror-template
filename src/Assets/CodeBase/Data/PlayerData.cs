@@ -1,6 +1,6 @@
 using Mirror;
 
-namespace Game.CodeBase
+namespace Game.CodeBase.Data
 {
     public enum ColorType
     {

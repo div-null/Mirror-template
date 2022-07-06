@@ -1,4 +1,5 @@
 using System;
+using Game.CodeBase.Data;
 using TMPro;
 using UnityEngine;
 

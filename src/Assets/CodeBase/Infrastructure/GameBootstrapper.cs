@@ -1,4 +1,4 @@
-using Game.CodeBase.Infrastructure.Network;
+using Game.CodeBase.Services.Network;
 using Game.CodeBase.States;
 using UnityEngine;
 
