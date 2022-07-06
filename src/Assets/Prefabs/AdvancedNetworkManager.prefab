@@ -10,7 +10,6 @@ GameObject:
   m_Component:
   - component: {fileID: 8800206310586938804}
   - component: {fileID: 8800206310586938800}
-  - component: {fileID: 8800206310586938802}
   - component: {fileID: 8025365793126965172}
   - component: {fileID: 8085879731823230668}
   - component: {fileID: 6214054037634985830}
@@ -68,19 +67,6 @@ MonoBehaviour:
           m_StringArgument: 
           m_BoolArgument: 0
         m_CallState: 2
---- !u!114 &8800206310586938802
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 8800206310586938764}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 8abac8e4c54a4e54f890de5b4a4d561b, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  _networkDiscovery: {fileID: 8800206310586938800}
 --- !u!114 &8025365793126965172
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -103,8 +89,7 @@ MonoBehaviour:
   networkAddress: localhost
   maxConnections: 100
   authenticator: {fileID: 0}
-  playerPrefab: {fileID: 8199798410209535405, guid: 90d1bb839364467498ae5754051f9efa,
-    type: 3}
+  playerPrefab: {fileID: 8199798410209535405, guid: 90d1bb839364467498ae5754051f9efa, type: 3}
   autoCreatePlayer: 1
   playerSpawnMethod: 0
   spawnPrefabs: []

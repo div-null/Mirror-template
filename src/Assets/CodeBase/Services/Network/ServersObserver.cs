@@ -1,61 +1,55 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using Game.CodeBase.Infrastructure;
 using Mirror.Discovery;
 using UnityEngine;
 
 namespace Game.CodeBase.Services.Network
 {
-    public class ServersObserver : MonoBehaviour
+    public class ServersObserver
     {
-        private  Dictionary<long, ServerResponse> _discoveredServers;
-        public Action<Dictionary<long, ServerResponse>> FoundServers;
-        public Action<ServerResponse> FoundServer;
-    
-        [SerializeField] private NetworkDiscovery _networkDiscovery;
-    
-        // Start is called before the first frame update
-        void Start()
+        public event Action<Dictionary<long, ServerResponse>> FoundServers;
+        public event Action<ServerResponse> FoundServer;
+        
+        private Dictionary<long, ServerResponse> _servers;
+        private readonly NetworkDiscovery _networkDiscovery;
+        private readonly ICoroutineRunner _runner;
+
+        public ServersObserver(NetworkDiscovery discovery, ICoroutineRunner runner)
         {
+            _runner = runner;
+            _networkDiscovery = discovery;
             _networkDiscovery.OnServerFound.AddListener(OnDiscoveredServer);
-            StartObservation();
         }
 
         public void StartObservation()
         {
-            _discoveredServers = new Dictionary<long, ServerResponse>();
-            StartCoroutine(WaitForObservation());
+            _servers = new Dictionary<long, ServerResponse>();
+            _runner.StartCoroutine(WaitForObservation());
         }
 
-        public IEnumerator WaitForObservation()
-        {
-            _networkDiscovery.StartDiscovery();
-            yield return new WaitForSeconds(1);
-            FoundServers?.Invoke(_discoveredServers);
-        }
-
-        void OnDiscoveredServer(ServerResponse serverResponse)
-        {
-            Debug.Log("Found server with port: " + serverResponse.uri.Port);
-            _discoveredServers.Add(serverResponse.serverId, serverResponse);
-            FoundServer?.Invoke(serverResponse);
-        }
-
-        // Update is called once per frame
-        void Update()
-        {
-        
-        }
-
-        public void AdvertiseServer()
-        {
+        public void AdvertiseServer() => 
             _networkDiscovery.AdvertiseServer();
-        }
 
         public void Reload()
         {
             _networkDiscovery.StopDiscovery();
             StartObservation();
+        }
+
+        IEnumerator WaitForObservation()
+        {
+            _networkDiscovery.StartDiscovery();
+            yield return new WaitForSeconds(1);
+            FoundServers?.Invoke(_servers);
+        }
+
+        void OnDiscoveredServer(ServerResponse serverResponse)
+        {
+            Debug.Log("Found server with port: " + serverResponse.uri.Port);
+            _servers.Add(serverResponse.serverId, serverResponse);
+            FoundServer?.Invoke(serverResponse);
         }
     }
 }
