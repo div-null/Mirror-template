@@ -1,5 +1,6 @@
 ﻿using Game.CodeBase.Infrastructure.States.CodeBase.Infrastructure.States;
 using Game.CodeBase.Services;
+using Game.CodeBase.Services.Network;
 
 namespace Game.CodeBase.Infrastructure.States
 {
@@ -9,20 +10,17 @@ namespace Game.CodeBase.Infrastructure.States
         private readonly GameStateMachine _stateMachine;
         private readonly SceneLoader _sceneLoader;
         private readonly MainInputActions _inputs;
-        private readonly PlayerProgressData _playerProgressData;
 
-        public BootstrapState(GameStateMachine gameStateMachine, SceneLoader sceneLoader, MainInputActions inputs, PlayerProgressData playerProgressData)
+        public BootstrapState(GameStateMachine gameStateMachine, SceneLoader sceneLoader, MainInputActions inputs)
         {
             _stateMachine = gameStateMachine;
             _sceneLoader = sceneLoader;
             _inputs = inputs;
-            _playerProgressData = playerProgressData;
         }
 
         public void Enter()
         {
             _inputs.Enable();
-            _playerProgressData.Load();
             _sceneLoader.Load(MainMenu, onLoaded: EnterLobbyPreparer);
         }
 

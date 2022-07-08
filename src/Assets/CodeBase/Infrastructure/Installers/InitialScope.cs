@@ -28,8 +28,7 @@ namespace Game.CodeBase.Infrastructure.Installers
 
                 var gameStateMachine = lifetimeScope.Container.Resolve<IGameStateMachine>();
                 var progressData = lifetimeScope.Container.Resolve<PlayerProgressData>();
-
-                progressData.Load();
+                Debug.Log(progressData.Progress);
                 gameStateMachine.Enter<BootstrapState>();
             }
         }
@@ -41,9 +40,9 @@ namespace Game.CodeBase.Infrastructure.Installers
             builder.Register<PlayerProgressData>(Lifetime.Singleton);
             builder.Register<MainInputActions>(Lifetime.Singleton);
             builder.RegisterEntryPoint<EntryPoint>();
-            
+
             AdvancedNetworkManager networkManager = Instantiate(_advancedNetworkManagerPrefab);
-            
+
             builder.UseComponents(components =>
             {
                 components.AddInstance(networkManager)
@@ -52,8 +51,8 @@ namespace Game.CodeBase.Infrastructure.Installers
                     .AsSelf();
 
                 components.AddInstance(networkManager.GetComponent<NetworkDiscovery>());
+                components.AddInstance(networkManager.GetComponent<ClientAuthenticator>());
             });
-            
         }
     }
 }

@@ -1,5 +1,7 @@
 using System;
+using System.Collections.Generic;
 using System.Linq;
+using Game.CodeBase.Data;
 using Game.CodeBase.Implementations;
 using Game.CodeBase.Infrastructure;
 using Game.CodeBase.Player;
@@ -17,9 +19,10 @@ namespace Game.CodeBase.Services.Network
         public bool ConnectToAvailableServerAutomatically = false;
 
         public BasePlayer[] Players { get; } = new BasePlayer[4];
+        public List<string> PlayerNames = new List<string>();
 
         private IImplementator _implementator;
-        
+
         public event Action<NetworkConnection> OnClientConnected;
         public event Action<NetworkConnection> OnClientDisconnected;
         public event Action<NetworkConnectionToClient> OnClientConnectedOnServerSide;
@@ -69,6 +72,34 @@ namespace Game.CodeBase.Services.Network
         }
 
         /// <summary>
+        /// Called on the server when a client adds a new player with ClientScene.AddPlayer.
+        /// <para>The default implementation for this function creates a new player object from the playerPrefab.</para>
+        /// </summary>
+        /// <param name="conn">Connection from client.</param>
+        public override void OnServerAddPlayer(NetworkConnectionToClient conn)
+        {
+            int availableId = GetAvailableId();
+            if (availableId != -1 && CurrentScene == SceneManager.GetActiveScene().name)
+            {
+                // base.OnServerAddPlayer(conn)
+                Transform startPos = GetStartPosition();
+                GameObject player = startPos != null
+                    ? Instantiate(playerPrefab, startPos.position, startPos.rotation)
+                    : Instantiate(playerPrefab);
+                
+                player.name = $"{playerPrefab.name} [connId={conn.connectionId}]";
+                
+                var playerProgress = (PlayerProgress) conn.authenticationData;
+                BasePlayer basePlayer = player.GetComponent<BasePlayer>();
+                basePlayer.Initialize(availableId, playerProgress);
+                Players[availableId] = basePlayer;
+
+                NetworkServer.AddPlayerForConnection(conn, player);
+                OnServerAddedPlayer?.Invoke(conn);
+            }
+        }
+
+        /// <summary>
         /// Called on clients when disconnected from a server.
         /// <para>This is called on the client when it disconnects from the server. Override this function to decide what happens when the client disconnects.</para>
         /// </summary>
@@ -76,6 +107,9 @@ namespace Game.CodeBase.Services.Network
         public override void OnClientDisconnect(NetworkConnection conn)
         {
             base.OnClientDisconnect(conn);
+            
+            var player = conn.identity.GetComponent<BasePlayer>();
+            PlayerNames.Remove(player.Username);
 
             OnClientDisconnected?.Invoke(conn);
         }
@@ -105,24 +139,6 @@ namespace Game.CodeBase.Services.Network
         {
             OnClientDisconnectedOnServerSide?.Invoke(conn);
             base.OnServerDisconnect(conn);
-        }
-
-        /// <summary>
-        /// Called on the server when a client adds a new player with ClientScene.AddPlayer.
-        /// <para>The default implementation for this function creates a new player object from the playerPrefab.</para>
-        /// </summary>
-        /// <param name="conn">Connection from client.</param>
-        public override void OnServerAddPlayer(NetworkConnectionToClient conn)
-        {
-            int availableId = GetAvailableId();
-            if (availableId != -1 && CurrentScene == SceneManager.GetActiveScene().name)
-            {
-                base.OnServerAddPlayer(conn);
-                BasePlayer basePlayer = conn.identity.GetComponent<BasePlayer>();
-                basePlayer.Initialize(availableId);
-                Players[availableId] = basePlayer;
-                OnServerAddedPlayer?.Invoke(conn);
-            }
         }
 
         public int GetAvailableId()
@@ -241,8 +257,7 @@ namespace Game.CodeBase.Services.Network
         {
             base.OnClientNotReady();
         }
+
         #endregion
-        
-        
     }
 }
