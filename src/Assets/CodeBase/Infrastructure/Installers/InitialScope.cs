@@ -15,7 +15,7 @@ namespace Game.CodeBase.Infrastructure.Installers
 
         class EntryPoint : IStartable
         {
-            private InitialScope _scope;
+            private readonly InitialScope _scope;
 
             public EntryPoint(InitialScope scope)
             {

@@ -1,4 +1,5 @@
 using System;
+using Game.CodeBase.Infrastructure;
 using Game.CodeBase.Player;
 using Game.CodeBase.Services.Network;
 using Game.CodeBase.UI;
@@ -21,8 +22,8 @@ namespace Game.CodeBase.Implementations
         public LobbyImplementator(AdvancedNetworkManager advancedNetworkManager)
         {
             _advancedNetworkManager = advancedNetworkManager;
-            LobbyPlayerPrefab = Resources.Load<GameObject>("NetworkPrefabs/LobbyPlayerPrefab");
-            _lobbyUIPrefab = Resources.Load<GameObject>("UtilityPrefabs/LobbyUIPrefab");
+            LobbyPlayerPrefab = Resources.Load<GameObject>(AssetPath.LobbyPlayer);
+            _lobbyUIPrefab = Resources.Load<GameObject>(AssetPath.LobbyUI);
             Scene = "MainMenu";
         }
 
