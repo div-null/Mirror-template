@@ -8,7 +8,7 @@ namespace Game.CodeBase.UI
     public class LobbyUI : MonoBehaviour
     {
         public Action<string> UsernameChanged;
-        public Action<ColorType> ColorChanged;
+        public Action<Color> ColorChanged;
         public Action<int> SkinChanged;
         public Action ReadyChanged;
 

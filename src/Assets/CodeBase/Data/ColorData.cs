@@ -1,22 +1,31 @@
 ﻿using System;
+using Newtonsoft.Json;
+using UnityEngine;
 
 namespace Game.CodeBase.Data
 {
     [Serializable]
     public class ColorData
     {
-        public ColorType Color;
-        public Action Changed;
+        [JsonRequired] public readonly float R;
+        [JsonRequired] public readonly float G;
+        [JsonRequired] public readonly float B;
 
-        public ColorData()
+        [JsonIgnore] public readonly Color Color;
+
+        [JsonConstructor]
+        public ColorData(float r, float g, float b)
         {
-            Color = ColorType.Red;
+            R = r;
+            G = g;
+            B = b;
+            Color = new Color(R, G, B);
         }
-        
-        public void ChangeColor(ColorType colorType)
-        {
-            Color = colorType;
-            Changed?.Invoke();
-        }
+
+        public static implicit operator Color(ColorData color) =>
+            new Color(color.R, color.G, color.B);
+
+        public static implicit operator ColorData(Color color) =>
+            new ColorData(color.r, color.g, color.b);
     }
 }

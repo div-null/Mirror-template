@@ -1,22 +1,40 @@
-﻿using Random = UnityEngine.Random;
+﻿using System;
+using UnityEngine;
+using Random = System.Random;
 
 namespace Game.CodeBase.Data
 {
+    [Serializable]
     public class PlayerProgress
     {
-        public string Username;
-        //public int Money;
-        public ColorData ColorData;
-        //Текущий lvl и прогресс по нему
-        //public LevelProgressData LevelProgressData;
-        //Информация о скинах (какие открыты, а какие нет) + текущий скин персонажа
-       // public ItemsData SkinData;
+        private static Random _random = new Random();
 
+        public readonly string Username;
+        public readonly ColorData ColorData;
 
-        public PlayerProgress()
+        public PlayerProgress(string username, Color color)
         {
-            Username = "Player" + Random.Range(1000, 10000);
-            ColorData = new ColorData();
+            Username = username;
+            ColorData = color;
+        }
+
+        public static PlayerProgress Generate()
+        {
+            var username = "Player" + _random.Next(1000, 10000);
+            var color = RandomColor();
+            return new(username, color);
+        }
+
+        private static Color RandomColor()
+        {
+            int colorId = _random.Next(0, 3);
+            return colorId switch
+            {
+                1 => Color.red,
+                2 => Color.blue,
+                3 => Color.green,
+                _ => Color.yellow
+            };
         }
     }
 }

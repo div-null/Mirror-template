@@ -1,30 +1,65 @@
-﻿using UnityEngine;
+﻿using System;
+using Game.CodeBase.Data;
+using Newtonsoft.Json;
+using UnityEngine;
 
 namespace Game.CodeBase.Services
 {
     public class PlayerProgressData
     {
-        public string Username;
+        private const string PlayerProgressPath = "playerProgress";
+        public PlayerProgress Progress => backing.Value;
 
-        public void Load()
+        private Lazy<PlayerProgress> backing;
+
+        public PlayerProgressData()
         {
-            string loadedUsername = PlayerPrefs.GetString("Username", "");
-            if (loadedUsername == "")
+            backing = new Lazy<PlayerProgress>(LoadOrGenerate);
+        }
+
+        private PlayerProgress LoadOrGenerate()
+        {
+            var progress = LoadPlayerProgress();
+            if (progress == null)
             {
-                SetUsername("Player" + Random.Range(1000, 10000));
-                PlayerPrefs.Save();
+                progress = PlayerProgress.Generate();
+                SavePlayerProgress(progress);
             }
-            else
+
+            return progress;
+        }
+
+        public void SetPlayerProgress(PlayerProgress progress)
+        {
+            SavePlayerProgress(progress);
+            backing = new Lazy<PlayerProgress>(LoadOrGenerate);
+        }
+
+        private PlayerProgress LoadPlayerProgress()
+        {
+            string json = PlayerPrefs.GetString(PlayerProgressPath, "");
+            if (json == "") return null;
+
+            try
             {
-                Username = loadedUsername;
+                return JsonConvert.DeserializeObject<PlayerProgress>(json);
+            }
+            catch (JsonSerializationException e)
+            {
+                Console.WriteLine(e);
+                throw;
+            }
+            catch (Exception e)
+            {
+                return null;
             }
         }
 
-
-        public void SetUsername(string username)
+        private void SavePlayerProgress(PlayerProgress progress)
         {
-            Username = username;
-            PlayerPrefs.SetString("Username", Username);
+            string json = JsonConvert.SerializeObject(progress);
+            PlayerPrefs.SetString(PlayerProgressPath, json);
+            PlayerPrefs.Save();
         }
     }
 }
