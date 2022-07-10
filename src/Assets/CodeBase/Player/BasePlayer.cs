@@ -68,16 +68,5 @@ namespace Game.CodeBase.Player
         {
             Destroyed?.Invoke();
         }
-
-        public override void OnStartAuthority()
-        {
-            CmdChangeUsername(_playerProgress.Username);
-        }
-
-        [Command]
-        public void CmdRemoveAuthority()
-        {
-            GetComponent<NetworkIdentity>().RemoveClientAuthority();
-        }
     }
 }

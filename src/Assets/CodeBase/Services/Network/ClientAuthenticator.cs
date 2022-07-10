@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using Game.CodeBase.Data;
 using Mirror;
-using Mirror.Examples.Chat;
 using UnityEngine;
 using VContainer;
 

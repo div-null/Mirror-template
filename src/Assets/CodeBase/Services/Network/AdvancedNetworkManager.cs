@@ -2,12 +2,14 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using Game.CodeBase.Data;
+using Game.CodeBase.Game;
 using Game.CodeBase.Implementations;
 using Game.CodeBase.Infrastructure;
 using Game.CodeBase.Player;
 using Mirror;
 using UnityEngine;
 using UnityEngine.SceneManagement;
+using VContainer;
 
 namespace Game.CodeBase.Services.Network
 {
@@ -22,6 +24,7 @@ namespace Game.CodeBase.Services.Network
         public List<string> PlayerNames = new List<string>();
 
         private IImplementator _implementator;
+        private PlayerFactory _playerFactory;
 
         public event Action<NetworkConnection> OnClientConnected;
         public event Action<NetworkConnection> OnClientDisconnected;
@@ -29,6 +32,13 @@ namespace Game.CodeBase.Services.Network
         public event Action<NetworkConnectionToClient> OnClientDisconnectedOnServerSide;
         public event Action<NetworkConnectionToClient> OnServerAddedPlayer;
 
+
+        [Inject]
+        public void Initialize(PlayerFactory playerFactory)
+        {
+            _playerFactory = playerFactory;
+        }
+        
         public void SetImplementator(IImplementator implementator)
         {
             _implementator = implementator;
@@ -81,20 +91,10 @@ namespace Game.CodeBase.Services.Network
             int availableId = GetAvailableId();
             if (availableId != -1 && CurrentScene == SceneManager.GetActiveScene().name)
             {
-                // base.OnServerAddPlayer(conn)
-                Transform startPos = GetStartPosition();
-                GameObject player = startPos != null
-                    ? Instantiate(playerPrefab, startPos.position, startPos.rotation)
-                    : Instantiate(playerPrefab);
-                
-                player.name = $"{playerPrefab.name} [connId={conn.connectionId}]";
-                
-                var playerProgress = (PlayerProgress) conn.authenticationData;
-                BasePlayer basePlayer = player.GetComponent<BasePlayer>();
-                basePlayer.Initialize(availableId, playerProgress);
-                Players[availableId] = basePlayer;
+                BasePlayer player = _playerFactory.CreatePlayer(conn, availableId);
+                Players[availableId] = player;
 
-                NetworkServer.AddPlayerForConnection(conn, player);
+                NetworkServer.AddPlayerForConnection(conn, player.gameObject);
                 OnServerAddedPlayer?.Invoke(conn);
             }
         }

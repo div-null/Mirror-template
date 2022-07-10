@@ -1,4 +1,6 @@
-﻿using Game.CodeBase.Infrastructure.States;
+﻿using Game.CodeBase.Game;
+using Game.CodeBase.Infrastructure.States;
+using Game.CodeBase.Lobby;
 using Game.CodeBase.Services;
 using Game.CodeBase.Services.Network;
 using Mirror;
@@ -41,7 +43,11 @@ namespace Game.CodeBase.Infrastructure.Installers
             builder.Register<MainInputActions>(Lifetime.Singleton);
             builder.RegisterEntryPoint<EntryPoint>();
 
+
             AdvancedNetworkManager networkManager = Instantiate(_advancedNetworkManagerPrefab);
+
+            builder.Register<LobbyFactory>(Lifetime.Singleton);
+            builder.Register(_ => new PlayerFactory(networkManager.GetStartPosition(), networkManager.playerPrefab), Lifetime.Singleton);
 
             builder.UseComponents(components =>
             {
