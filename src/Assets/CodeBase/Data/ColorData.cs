@@ -1,7 +1,6 @@
 ﻿using System;
 using Mirror;
 using Newtonsoft.Json;
-using Unity.VisualScripting;
 using UnityEngine;
 
 namespace Game.CodeBase.Data
@@ -9,11 +8,11 @@ namespace Game.CodeBase.Data
     [Serializable]
     public class ColorData
     {
-        [JsonRequired] public readonly float R;
-        [JsonRequired] public readonly float G;
-        [JsonRequired] public readonly float B;
+        [JsonProperty] public float R { get; set; }
+        [JsonProperty] public float G { get; set; }
+        [JsonProperty] public float B { get; set; }
 
-        [JsonIgnore, DoNotSerialize] public readonly Color Color;
+        [JsonIgnore] public readonly Color Color;
 
         [JsonConstructor]
         public ColorData(float r, float g, float b)
@@ -24,11 +23,8 @@ namespace Game.CodeBase.Data
             Color = new Color(R, G, B);
         }
 
-        public static implicit operator Color(ColorData color) =>
-            new Color(color.R, color.G, color.B);
-
         public static implicit operator ColorData(Color color) =>
-            new ColorData(color.r, color.g, color.b);
+            new(color.r, color.g, color.b);
     }
 
     public static class ColorDataReaderWriter

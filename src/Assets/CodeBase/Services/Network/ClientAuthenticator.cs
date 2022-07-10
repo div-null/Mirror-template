@@ -158,7 +158,7 @@ namespace Game.CodeBase.Services.Network
             AuthRequestMessage authRequestMessage = new AuthRequestMessage
             {
                 Username = progress.Username,
-                Color = progress.ColorData
+                Color = progress.ColorData.Color
             };
 
             NetworkClient.connection.Send(authRequestMessage);

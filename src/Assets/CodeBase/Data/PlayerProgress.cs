@@ -1,4 +1,5 @@
 ﻿using System;
+using Newtonsoft.Json;
 using UnityEngine;
 using Random = System.Random;
 
@@ -9,10 +10,11 @@ namespace Game.CodeBase.Data
     {
         private static Random _random = new Random();
 
-        public readonly string Username;
-        public readonly ColorData ColorData;
+        public string Username { get; set; }
+        public ColorData ColorData { get; set; }
 
-        public PlayerProgress(string username, Color color)
+        [JsonConstructor]
+        public PlayerProgress(string username, ColorData color)
         {
             Username = username;
             ColorData = color;

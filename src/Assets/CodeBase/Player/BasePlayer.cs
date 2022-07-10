@@ -2,7 +2,6 @@
 using Game.CodeBase.Data;
 using Mirror;
 using UnityEngine;
-using VContainer;
 
 namespace Game.CodeBase.Player
 {
@@ -31,7 +30,7 @@ namespace Game.CodeBase.Player
         {
             Id = availableId;
             Username = playerProgress.Username;
-            Color = playerProgress.ColorData;
+            Color = playerProgress.ColorData.Color;
             _playerProgress = playerProgress;
         }
 
