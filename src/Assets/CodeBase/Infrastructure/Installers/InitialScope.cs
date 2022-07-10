@@ -1,6 +1,6 @@
 ﻿using Game.CodeBase.Game;
+using Game.CodeBase.Game.Lobby;
 using Game.CodeBase.Infrastructure.States;
-using Game.CodeBase.Lobby;
 using Game.CodeBase.Services;
 using Game.CodeBase.Services.Network;
 using Mirror;

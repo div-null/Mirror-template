@@ -7,11 +7,12 @@ namespace Game.CodeBase.Player
 {
     public class BasePlayer : NetworkBehaviour
     {
-        public event Action<int, string> UsernameChanged;
+        public event Action<string> UsernameChanged;
         public event Action<int> IdChanged;
         public event Action<Color> ColorChanged;
+        public event Action Spawned;
         public event Action Destroyed;
-        
+
         [SyncVar(hook = nameof(HandleIdChanged))]
         public int Id;
         [SyncVar(hook = nameof(HandleUsernameChanged))]
@@ -38,7 +39,7 @@ namespace Game.CodeBase.Player
         public void CmdChangeUsername(string username)
         {
             Username = username;
-            UsernameChanged?.Invoke(Id, username);
+            UsernameChanged?.Invoke(username);
         }
 
         [Command]
@@ -50,7 +51,7 @@ namespace Game.CodeBase.Player
 
         public void HandleUsernameChanged(string oldValue, string newValue)
         {
-            UsernameChanged?.Invoke(Id, newValue);
+            UsernameChanged?.Invoke(newValue);
         }
 
         public void HandleIdChanged(int oldValue, int newValue)
