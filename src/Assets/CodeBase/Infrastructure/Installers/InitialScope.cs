@@ -56,7 +56,10 @@ namespace Game.CodeBase.Infrastructure.Installers
                     .As<NetworkManager>()
                     .AsSelf();
 
-                components.AddInstance(networkManager.GetComponent<NetworkDiscovery>());
+                components.AddInstance(networkManager.GetComponent<CustomNetworkDiscovery>())
+                    .As<INetworkDiscovery>()
+                    .AsSelf();
+                
                 components.AddInstance(networkManager.GetComponent<ClientAuthenticator>());
             });
         }

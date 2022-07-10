@@ -9,47 +9,50 @@ namespace Game.CodeBase.Services.Network
 {
     public class ServersObserver
     {
-        public event Action<Dictionary<long, ServerResponse>> FoundServers;
-        public event Action<ServerResponse> FoundServer;
-        
-        private Dictionary<long, ServerResponse> _servers;
-        private readonly NetworkDiscovery _networkDiscovery;
+        public event Action<Dictionary<long, ServerInfo>> FoundServers;
+        public event Action<ServerInfo> FoundServer;
+
+        private Dictionary<long, ServerInfo> _servers;
+        private readonly INetworkDiscovery _networkDiscovery;
         private readonly ICoroutineRunner _runner;
 
-        public ServersObserver(NetworkDiscovery discovery, ICoroutineRunner runner)
+        public ServersObserver(INetworkDiscovery discovery, ICoroutineRunner runner)
         {
             _runner = runner;
             _networkDiscovery = discovery;
-            _networkDiscovery.OnServerFound.AddListener(OnDiscoveredServer);
+            _networkDiscovery.OnServerFound += OnDiscoveredServer;
+        }
+
+        private void OnDiscoveredServer(ServerInfo server)
+        {
+            Debug.Log("Found server with url: " + server.Uri);
+            _servers.Add(server.ServerId, server);
+            FoundServer?.Invoke(server);
         }
 
         public void StartObservation()
         {
-            _servers = new Dictionary<long, ServerResponse>();
+            _servers = new Dictionary<long, ServerInfo>();
             _runner.StartCoroutine(WaitForObservation());
         }
 
-        public void AdvertiseServer() => 
+        public void AdvertiseServer() =>
             _networkDiscovery.AdvertiseServer();
 
         public void Reload()
         {
-            _networkDiscovery.StopDiscovery();
+            Stop();
             StartObservation();
         }
+
+        public void Stop() =>
+            _networkDiscovery.StopDiscovery();
 
         IEnumerator WaitForObservation()
         {
             _networkDiscovery.StartDiscovery();
             yield return new WaitForSeconds(1);
             FoundServers?.Invoke(_servers);
-        }
-
-        void OnDiscoveredServer(ServerResponse serverResponse)
-        {
-            Debug.Log("Found server with port: " + serverResponse.uri.Port);
-            _servers.Add(serverResponse.serverId, serverResponse);
-            FoundServer?.Invoke(serverResponse);
         }
     }
 }

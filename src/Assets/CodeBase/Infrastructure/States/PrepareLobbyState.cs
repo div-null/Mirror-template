@@ -2,6 +2,7 @@
 using System.Linq;
 using Game.CodeBase.Implementations;
 using Game.CodeBase.Infrastructure.States.CodeBase.Infrastructure.States;
+using Game.CodeBase.Services;
 using Game.CodeBase.Services.Network;
 using kcp2k;
 using Mirror;
@@ -29,7 +30,7 @@ namespace Game.CodeBase.Infrastructure.States
             _serversObserver.StartObservation();
         }
 
-        private void JoinOrHost(Dictionary<long, ServerResponse> foundServers)
+        private void JoinOrHost(Dictionary<long, ServerInfo> foundServers)
         {
             _advancedNetworkManager.SetImplementator(new LobbyImplementator(_advancedNetworkManager));
             if (foundServers.Count == 0)
@@ -45,12 +46,12 @@ namespace Game.CodeBase.Infrastructure.States
                     Debug.Log("Start client");
                     //TODO: Change response information to find out if the server is available
                     var firstServerInfo = foundServers.First().Value;
-                    _advancedNetworkManager.StartClient(firstServerInfo.uri);
+                    _advancedNetworkManager.StartClient(firstServerInfo.Uri);
                 }
                 else
                 {
                     Debug.Log("Start host");
-                    ushort newPort = FindEmptyPort(foundServers);
+                    ushort newPort = (ushort)PortScanner.GetAvailablePort(4000);
                     _advancedNetworkManager.gameObject.GetComponent<KcpTransport>().Port = newPort;
                     _advancedNetworkManager.StartHost();
                     _serversObserver.AdvertiseServer();
@@ -58,32 +59,9 @@ namespace Game.CodeBase.Infrastructure.States
             }
         }
 
-        private ushort FindEmptyPort(Dictionary<long, ServerResponse> foundServers)
-        {
-            string myIp = NetworkManager.singleton.networkAddress;
-            ushort myPort = 7777;
-            bool isUnique = false;
-            while (!isUnique)
-            {
-                foreach (var server in foundServers)
-                {
-                    if (server.Value.EndPoint.Address.ToString() == myIp && server.Value.uri.Port == myPort)
-                    {
-                        isUnique = false;
-                        myPort++;
-                        break;
-                    }
-                }
-
-                isUnique = true;
-            }
-
-            return myPort;
-        }
-
         public void Exit()
         {
-            
+            _serversObserver.Stop();
         }
     }
 }
