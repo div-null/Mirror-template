@@ -1,6 +1,7 @@
 ﻿using Cysharp.Threading.Tasks;
 using Game.CodeBase.Data;
 using Game.CodeBase.Infrastructure;
+using Game.CodeBase.Player;
 using Game.CodeBase.Services.Network;
 using Game.CodeBase.UI;
 using Mirror;

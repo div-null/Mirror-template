@@ -1,5 +1,7 @@
 ﻿using System;
+using Mirror;
 using Newtonsoft.Json;
+using Unity.VisualScripting;
 using UnityEngine;
 
 namespace Game.CodeBase.Data
@@ -11,7 +13,7 @@ namespace Game.CodeBase.Data
         [JsonRequired] public readonly float G;
         [JsonRequired] public readonly float B;
 
-        [JsonIgnore] public readonly Color Color;
+        [JsonIgnore, DoNotSerialize] public readonly Color Color;
 
         [JsonConstructor]
         public ColorData(float r, float g, float b)
@@ -27,5 +29,20 @@ namespace Game.CodeBase.Data
 
         public static implicit operator ColorData(Color color) =>
             new ColorData(color.r, color.g, color.b);
+    }
+
+    public static class ColorDataReaderWriter
+    {
+        public static void WriteDateTime(this NetworkWriter writer, ColorData color)
+        {
+            writer.Write(color.R);
+            writer.Write(color.G);
+            writer.Write(color.B);
+        }
+
+        public static ColorData ReadDateTime(this NetworkReader reader)
+        {
+            return new ColorData(reader.ReadFloat(), reader.ReadFloat(), reader.ReadFloat());
+        }
     }
 }
