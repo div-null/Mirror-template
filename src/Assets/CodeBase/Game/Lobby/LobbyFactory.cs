@@ -19,7 +19,7 @@ namespace Game.CodeBase.Game.Lobby
             var playerObj = (GameObject) await LobbyPlayerTask;
             var lobbyPlayer = Object.Instantiate(playerObj).GetComponent<LobbyPlayer>();
             lobbyPlayer.Initialize(basePlayer, isLeader);
-            
+
             NetworkServer.Spawn(playerObj, conn);
             return lobbyPlayer;
         }
@@ -28,6 +28,14 @@ namespace Game.CodeBase.Game.Lobby
         {
             Object lobbyUI = await LobbyUITask;
             return Object.Instantiate(lobbyUI).GetComponent<LobbyUI>();
+        }
+
+        public async UniTask<Lobby> SpawnLobby()
+        {
+            GameObject gameObject = GameObject.Instantiate(new GameObject("Server - Lobby"));
+            var lobby = gameObject.GetOrAddComponent<Lobby>();
+            NetworkServer.Spawn(gameObject);
+            return lobby;
         }
     }
 }

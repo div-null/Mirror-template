@@ -1,11 +1,8 @@
 ﻿using System;
 using System.Threading.Tasks;
-using Game.CodeBase.Infrastructure.Installers;
 using Game.CodeBase.Player;
 using Game.CodeBase.UI;
 using Mirror;
-using VContainer;
-using VContainer.Unity;
 
 namespace Game.CodeBase.Game.Lobby
 {
@@ -16,22 +13,18 @@ namespace Game.CodeBase.Game.Lobby
         private LobbyPlayer localClient;
         private LobbyFactory _factory;
 
-        public void Start()
+        public void Initialize(LobbyFactory factory, LobbyUI lobbyUI)
         {
-            Initialize();
-        }
-
-        public void Initialize()
-        {
-            // TODO: fix injection
-            LifetimeScope scope = LifetimeScope.Find<InitialScope>();
-            _factory = scope.Container.Resolve<LobbyFactory>();
+            _factory = factory;
+            _lobbyUI = lobbyUI;
             _players.Callback += onPlayersChanged;
         }
 
         public void AddPlayer(LobbyPlayer player)
         {
             bool isOwner = HasAuthority(player);
+            localClient ??= isOwner ? player : null;
+            
             _lobbyUI.SetupSlot(player, isOwner);
         }
 
