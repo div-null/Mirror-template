@@ -1,9 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using Game.CodeBase.Data;
 using Game.CodeBase.Game;
-using Game.CodeBase.Implementations;
 using Game.CodeBase.Infrastructure;
 using Game.CodeBase.Player;
 using Mirror;
@@ -23,7 +21,6 @@ namespace Game.CodeBase.Services.Network
         public BasePlayer[] Players { get; } = new BasePlayer[4];
         public List<string> PlayerNames = new List<string>();
 
-        private IImplementator _implementator;
         private PlayerFactory _playerFactory;
 
         public event Action<NetworkConnection> OnClientConnected;
@@ -37,13 +34,6 @@ namespace Game.CodeBase.Services.Network
         public void Initialize(PlayerFactory playerFactory)
         {
             _playerFactory = playerFactory;
-        }
-        
-        public void SetImplementator(IImplementator implementator)
-        {
-            _implementator = implementator;
-            CurrentScene = _implementator.Scene;
-            _implementator.Setup();
         }
 
         public override void OnStartServer()
@@ -107,7 +97,7 @@ namespace Game.CodeBase.Services.Network
         public override void OnClientDisconnect(NetworkConnection conn)
         {
             base.OnClientDisconnect(conn);
-            
+
             var player = conn.identity.GetComponent<BasePlayer>();
             PlayerNames.Remove(player.Username);
 
