@@ -5,14 +5,16 @@ using Game.CodeBase.Game;
 using Game.CodeBase.Infrastructure;
 using Game.CodeBase.Player;
 using Mirror;
+using UniRx;
 using UnityEngine;
-using UnityEngine.SceneManagement;
 using VContainer;
 
 namespace Game.CodeBase.Services.Network
 {
     public class AdvancedNetworkManager : NetworkManager, ICoroutineRunner
     {
+        public readonly ReactiveCommand<BasePlayer> AddPlayer = new ReactiveCommand<BasePlayer>();
+
         [Header("Base information")] public int MinConnections = 2;
         [Scene] public string CurrentScene = string.Empty;
 
@@ -79,13 +81,13 @@ namespace Game.CodeBase.Services.Network
         public override void OnServerAddPlayer(NetworkConnectionToClient conn)
         {
             int availableId = GetAvailableId();
-            if (availableId != -1 && CurrentScene == SceneManager.GetActiveScene().name)
+            if (availableId != -1)
             {
                 BasePlayer player = _playerFactory.CreatePlayer(conn, availableId);
                 Players[availableId] = player;
 
                 NetworkServer.AddPlayerForConnection(conn, player.gameObject);
-                OnServerAddedPlayer?.Invoke(conn);
+                AddPlayer.Execute(player);
             }
         }
 

@@ -32,7 +32,7 @@ namespace Game.CodeBase.Game.Lobby
 
         public async UniTask<Lobby> SpawnLobby()
         {
-            GameObject gameObject = GameObject.Instantiate(new GameObject("Server - Lobby"));
+            GameObject gameObject = new GameObject("Server - Lobby");
             var lobby = gameObject.GetOrAddComponent<Lobby>();
             NetworkServer.Spawn(gameObject);
             return lobby;
