@@ -9,10 +9,13 @@ namespace Game.CodeBase.Infrastructure.Installers
     public class GameStateMachineInstaller : IInstaller
     {
         private IGameStateMachine _gameStateMachine;
+
         public void Install(IContainerBuilder builder)
         {
             builder.Register<BootstrapState>(Lifetime.Singleton).AsImplementedInterfaces();
-            builder.Register<PrepareLobbyState>(Lifetime.Scoped).AsImplementedInterfaces();
+            builder.Register<SearchServersState>(Lifetime.Scoped).AsImplementedInterfaces();
+            builder.Register<HostLobbyState>(Lifetime.Scoped).AsImplementedInterfaces();
+            builder.Register<JoinLobbyState>(Lifetime.Scoped).AsImplementedInterfaces();
             builder.Register<HotPotatoState>(Lifetime.Scoped).AsImplementedInterfaces();
             builder.Register<GameStateMachine>(Lifetime.Singleton).As<IGameStateMachine>().AsSelf();
             builder.RegisterBuildCallback(container =>
