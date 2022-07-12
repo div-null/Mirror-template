@@ -64,9 +64,9 @@ namespace Game.CodeBase.UI
             int slotId = basePlayer.Id;
             PlayerSlotUI slot = PlayerSlots[slotId];
 
-            basePlayer.ColorChanged += (color) => updateColor(slotId, color);
-            basePlayer.UsernameChanged += slot.SetNickname;
-            lobbyPlayer.ReadyChanged += slot.SetReady;
+            basePlayer.ColorChanged.Subscribe((color) => updateColor(slotId, color));
+            basePlayer.UsernameChanged.Subscribe(slot.SetNickname);
+            lobbyPlayer.ReadyChanged.Subscribe(slot.SetReady);
 
             slot.Initialize(basePlayer.Username, lobbyPlayer.IsReady);
             updateColor(slotId, basePlayer.Color);

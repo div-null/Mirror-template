@@ -1,17 +1,22 @@
-﻿using System;
-using Mirror;
+﻿using Mirror;
+using UniRx;
 
 namespace Game.CodeBase.Player
 {
     public class LobbyPlayer : NetworkBehaviour
     {
-        public event Action<bool> ReadyChanged;
+        public ReactiveCommand<bool> ReadyChanged;
 
         [SyncVar(hook = nameof(handleReadyChanged))]
         public bool IsReady = false;
 
         [SyncVar] public BasePlayer BasePlayer;
         [SyncVar] public bool IsLeader;
+
+        private void Awake()
+        {
+            ReadyChanged = new ReactiveCommand<bool>();
+        }
 
         public void Initialize(BasePlayer basePlayer, bool isLeader)
         {
@@ -32,7 +37,7 @@ namespace Game.CodeBase.Player
 
         private void handleReadyChanged(bool old, bool @new)
         {
-            ReadyChanged?.Invoke(@new);
+            ReadyChanged.Execute(@new);
         }
     }
 }

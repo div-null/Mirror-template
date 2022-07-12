@@ -1,17 +1,18 @@
 ﻿using System;
 using Game.CodeBase.Data;
 using Mirror;
+using UniRx;
 using UnityEngine;
 
 namespace Game.CodeBase.Player
 {
     public class BasePlayer : NetworkBehaviour
     {
-        public event Action<string> UsernameChanged;
-        public event Action<int> IdChanged;
-        public event Action<Color> ColorChanged;
-        public event Action Spawned;
-        public event Action Destroyed;
+        public ReactiveCommand<int> IdChanged { get; private set; }
+        public ReactiveCommand<string> UsernameChanged { get; private set; }
+        public ReactiveCommand<Color> ColorChanged { get; private set; }
+        public ReactiveCommand Spawned { get; private set; }
+        public ReactiveCommand Destroyed { get; private set; }
 
         [SyncVar(hook = nameof(HandleIdChanged))]
         public int Id;
@@ -28,7 +29,12 @@ namespace Game.CodeBase.Player
 
         private void Awake()
         {
-            IdChanged += (value) => Debug.Log($"New id={value}");
+            IdChanged = new ReactiveCommand<int>();
+            UsernameChanged = new ReactiveCommand<string>();
+            ColorChanged = new ReactiveCommand<Color>();
+            Spawned = new ReactiveCommand();
+            Destroyed = new ReactiveCommand();
+            IdChanged.Subscribe((value) => Debug.Log($"New id={value}"));
         }
 
         public override void OnStartClient()
@@ -48,41 +54,48 @@ namespace Game.CodeBase.Player
         private void CmdSpawned()
         {
             IsSpawned = true;
-            Spawned?.Invoke();
+            Spawned.Execute();
         }
 
         [Command]
         public void CmdChangeUsername(string username)
         {
             Username = username;
-            UsernameChanged?.Invoke(username);
+            UsernameChanged.Execute(username);
         }
 
         [Command]
         public void CmdChangeId(int newId)
         {
             Id = newId;
-            IdChanged?.Invoke(newId);
+            IdChanged.Execute(newId);
+        }
+
+        [Command]
+        public void CmdSetColor(Color newColor)
+        {
+            Color = newColor;
+            ColorChanged.Execute(newColor);
         }
 
         public void HandleUsernameChanged(string oldValue, string newValue)
         {
-            UsernameChanged?.Invoke(newValue);
+            UsernameChanged.Execute(newValue);
         }
 
         public void HandleIdChanged(int oldValue, int newValue)
         {
-            IdChanged?.Invoke(newValue);
+            IdChanged.Execute(newValue);
         }
 
         public void HandleColorChanged(Color oldValue, Color newValue)
         {
-            ColorChanged?.Invoke(newValue);
+            ColorChanged.Execute(newValue);
         }
 
         private void OnDestroy()
         {
-            Destroyed?.Invoke();
+            Destroyed.Execute();
         }
     }
 }
