@@ -4,6 +4,7 @@ using System.Linq;
 using Game.CodeBase.Data;
 using JetBrains.Annotations;
 using Mirror;
+using Unity.VisualScripting;
 using UnityEngine;
 using VContainer;
 
@@ -95,10 +96,11 @@ namespace Game.CodeBase.Services.Network
 
             if (connectionsPendingDisconnect.Contains(conn)) return;
 
-            int nameDuplicates = _networkManager.PlayerNames.Count(name => name.StartsWith(msg.Username));
+            int nameDuplicates = _networkManager.Players
+                .NotNull()
+                .Count(player => player.Username.StartsWith(msg.Username));
 
             var playerProgress = new PlayerProgress(DuplicateName(msg.Username, nameDuplicates), msg.Color);
-            _networkManager.PlayerNames.Add(playerProgress.Username);
 
             // This will be read in Player.OnStartServer
             conn.authenticationData = playerProgress;

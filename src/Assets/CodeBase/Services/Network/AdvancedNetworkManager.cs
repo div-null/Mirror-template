@@ -22,7 +22,6 @@ namespace Game.CodeBase.Services.Network
         public bool ConnectToAvailableServerAutomatically = false;
 
         public BasePlayer[] Players { get; } = new BasePlayer[4];
-        public List<string> PlayerNames = new List<string>();
 
         private PlayerFactory _playerFactory;
 
@@ -101,9 +100,6 @@ namespace Game.CodeBase.Services.Network
         public override void OnClientDisconnect(NetworkConnection conn)
         {
             base.OnClientDisconnect(conn);
-
-            var player = conn.identity.GetComponent<BasePlayer>();
-            PlayerNames.Remove(player.Username);
 
             OnClientDisconnected?.Invoke(conn);
         }
