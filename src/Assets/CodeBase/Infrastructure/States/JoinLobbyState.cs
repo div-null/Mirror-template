@@ -1,19 +1,21 @@
-﻿using System.Threading.Tasks;
+﻿using System;
 using Cysharp.Threading.Tasks;
 using Game.CodeBase.Game.Lobby;
 using Game.CodeBase.Services.Network;
-using Mirror;
-using UnityEngine;
+using Game.CodeBase.UI;
+using UniRx;
 
 namespace Game.CodeBase.Infrastructure.States
 {
     public class JoinLobbyState : IPayloadedState<ServerInfo>
     {
-        private readonly NetworkManager _networkManager;
+        private readonly AdvancedNetworkManager _networkManager;
         private readonly LobbyFactory _lobbyFactory;
         private Lobby _lobby;
+        private LobbyUI _lobbyUI;
+        private IObservable<Lobby> _networkingSynced;
 
-        public JoinLobbyState(LobbyFactory lobbyFactory, NetworkManager networkManager)
+        public JoinLobbyState(LobbyFactory lobbyFactory, AdvancedNetworkManager networkManager)
         {
             _lobbyFactory = lobbyFactory;
             _networkManager = networkManager;
@@ -21,20 +23,27 @@ namespace Game.CodeBase.Infrastructure.States
 
         public async void Enter(ServerInfo server)
         {
+            _networkingSynced = Observable.FromEvent<Lobby>(
+                    ev => Lobby.Spawned += ev,
+                    ev => Lobby.Spawned -= ev)
+                .First();
+
+            _networkingSynced.Subscribe(LobbySpawned);
             _networkManager.StartClient(server.Uri);
             await UniTask.WaitUntil(() => _networkManager.isNetworkActive);
-            await InitializeLobby();
         }
 
         public void Exit()
         {
+            
         }
+        
 
-        private async Task InitializeLobby()
+        private async void LobbySpawned(Lobby lobby)
         {
-            var lobbyUI = await _lobbyFactory.CreateUI();
-            _lobby = Object.FindObjectOfType<Lobby>();
-            _lobby.Initialize(_lobbyFactory, lobbyUI);
+            _lobbyUI = await _lobbyFactory.CreateUI();
+            _lobby = lobby;
+            _lobby.Initialize(_lobbyFactory, _lobbyUI);
         }
     }
 }

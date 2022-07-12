@@ -28,9 +28,6 @@ namespace Game.CodeBase.Services.Network
 
         public event Action<NetworkConnection> OnClientConnected;
         public event Action<NetworkConnection> OnClientDisconnected;
-        public event Action<NetworkConnectionToClient> OnClientConnectedOnServerSide;
-        public event Action<NetworkConnectionToClient> OnClientDisconnectedOnServerSide;
-        public event Action<NetworkConnectionToClient> OnServerAddedPlayer;
 
 
         [Inject]
@@ -59,6 +56,11 @@ namespace Game.CodeBase.Services.Network
         public override void OnStopServer()
         {
             AddPlayerBuffered = AddPlayer.Replay(4);
+        }
+
+        public override void OnApplicationQuit()
+        {
+            StopHost();
         }
 
         /// <summary>
@@ -117,20 +119,6 @@ namespace Game.CodeBase.Services.Network
             {
                 conn.Disconnect();
             }
-
-            //TODO: Сделать возможность проверки на повторяющиеся ники + реконнект и пауза для ожидания реконнекта
-            OnClientConnectedOnServerSide?.Invoke(conn);
-        }
-
-        /// <summary>
-        /// Called on the server when a client disconnects.
-        /// <para>This is called on the Server when a Client disconnects from the Server. Use an override to decide what should happen when a disconnection is detected.</para>
-        /// </summary>
-        /// <param name="conn">Connection from client.</param>
-        public override void OnServerDisconnect(NetworkConnectionToClient conn)
-        {
-            OnClientDisconnectedOnServerSide?.Invoke(conn);
-            base.OnServerDisconnect(conn);
         }
 
         public int GetAvailableId()
@@ -144,6 +132,16 @@ namespace Game.CodeBase.Services.Network
 
             Debug.Log("Its not empty!");
             return -1;
+        }
+
+        /// <summary>
+        /// Called on the server when a client disconnects.
+        /// <para>This is called on the Server when a Client disconnects from the Server. Use an override to decide what should happen when a disconnection is detected.</para>
+        /// </summary>
+        /// <param name="conn">Connection from client.</param>
+        public override void OnServerDisconnect(NetworkConnectionToClient conn)
+        {
+            base.OnServerDisconnect(conn);
         }
 
         public override void OnStopClient()
