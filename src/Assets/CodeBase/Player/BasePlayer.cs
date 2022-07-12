@@ -1,12 +1,11 @@
-﻿using System;
-using Game.CodeBase.Data;
+﻿using Game.CodeBase.Data;
 using Mirror;
 using UniRx;
 using UnityEngine;
 
 namespace Game.CodeBase.Player
 {
-    public class BasePlayer : NetworkBehaviour
+    public class BasePlayer : NetworkBehaviour, IPlayer
     {
         public ReactiveCommand<int> IdChanged { get; private set; }
         public ReactiveCommand<string> UsernameChanged { get; private set; }
@@ -14,14 +13,15 @@ namespace Game.CodeBase.Player
         public ReactiveCommand Spawned { get; private set; }
         public ReactiveCommand Destroyed { get; private set; }
 
-        [SyncVar(hook = nameof(HandleIdChanged))]
-        public int Id;
 
-        [SyncVar(hook = nameof(HandleUsernameChanged))]
-        public string Username;
+        [field: SyncVar(hook = nameof(HandleIdChanged))]
+        public int Id { get; private set; }
 
-        [SyncVar(hook = nameof(HandleColorChanged))]
-        public Color Color;
+        [field: SyncVar(hook = nameof(HandleUsernameChanged))]
+        public string Username { get; private set; }
+
+        [field: SyncVar(hook = nameof(HandleColorChanged))]
+        public Color Color { get; private set; }
 
         [SyncVar] public bool IsSpawned;
 
@@ -50,6 +50,18 @@ namespace Game.CodeBase.Player
             _playerProgress = playerProgress;
         }
 
+        public void SetUsername(string username)
+        {
+            if (!isServer) return;
+            CmdChangeUsername(username);
+        }
+
+        public void SetColor(Color value)
+        {
+            if (!isServer) return;
+            CmdSetColor(value);
+        }
+
         [Command]
         private void CmdSpawned()
         {
@@ -58,44 +70,23 @@ namespace Game.CodeBase.Player
         }
 
         [Command]
-        public void CmdChangeUsername(string username)
-        {
-            Username = username;
-            UsernameChanged.Execute(username);
-        }
+        private void CmdChangeUsername(string username) =>
+            UsernameChanged.Execute(Username = username);
 
         [Command]
-        public void CmdChangeId(int newId)
-        {
-            Id = newId;
-            IdChanged.Execute(newId);
-        }
+        private void CmdSetColor(Color newColor) =>
+            ColorChanged.Execute(Color = newColor);
 
-        [Command]
-        public void CmdSetColor(Color newColor)
-        {
-            Color = newColor;
-            ColorChanged.Execute(newColor);
-        }
-
-        public void HandleUsernameChanged(string oldValue, string newValue)
-        {
+        public void HandleUsernameChanged(string oldValue, string newValue) =>
             UsernameChanged.Execute(newValue);
-        }
 
-        public void HandleIdChanged(int oldValue, int newValue)
-        {
+        public void HandleIdChanged(int oldValue, int newValue) =>
             IdChanged.Execute(newValue);
-        }
 
-        public void HandleColorChanged(Color oldValue, Color newValue)
-        {
+        public void HandleColorChanged(Color oldValue, Color newValue) =>
             ColorChanged.Execute(newValue);
-        }
 
-        private void OnDestroy()
-        {
+        private void OnDestroy() =>
             Destroyed.Execute();
-        }
     }
 }

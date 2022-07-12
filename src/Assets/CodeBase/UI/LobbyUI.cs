@@ -64,16 +64,15 @@ namespace Game.CodeBase.UI
 
         public void SetupSlot(LobbyPlayer lobbyPlayer)
         {
-            BasePlayer basePlayer = lobbyPlayer.BasePlayer;
-            int slotId = basePlayer.Id;
+            int slotId = lobbyPlayer.Id;
             PlayerSlotUI slot = PlayerSlots[slotId];
 
-            basePlayer.ColorChanged.Subscribe((color) => updateColor(slotId, color));
-            basePlayer.UsernameChanged.Subscribe(slot.SetNickname);
+            lobbyPlayer.ColorChanged.Subscribe((color) => updateColor(slotId, color));
+            lobbyPlayer.UsernameChanged.Subscribe(slot.SetNickname);
             lobbyPlayer.ReadyChanged.Subscribe(slot.SetReady);
 
-            slot.Initialize(basePlayer.Username, lobbyPlayer.IsReady);
-            updateColor(slotId, basePlayer.Color);
+            slot.Initialize(lobbyPlayer.Username, lobbyPlayer.IsReady);
+            updateColor(slotId, lobbyPlayer.Color);
         }
 
         private void updateColor(int slotId, Color color)

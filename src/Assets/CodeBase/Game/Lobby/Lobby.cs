@@ -81,9 +81,9 @@ namespace Game.CodeBase.Game.Lobby
             localClient ??= hasAuthority ? player : null;
             if (hasAuthority)
             {
-                _lobbyUI.Username.Subscribe(player.BasePlayer.CmdChangeUsername);
-                _lobbyUI.Ready.Subscribe(player.CmdSetReadyStatus);
-                _lobbyUI.Color.Subscribe(player.BasePlayer.CmdSetColor);
+                _lobbyUI.Username.Subscribe(player.SetUsername);
+                _lobbyUI.Ready.Subscribe(player.SetReady);
+                _lobbyUI.Color.Subscribe(player.SetColor);
             }
 
             _lobbyUI.SetupSlot(player);
