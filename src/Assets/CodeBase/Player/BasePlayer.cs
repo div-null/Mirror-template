@@ -15,10 +15,14 @@ namespace Game.CodeBase.Player
 
         [SyncVar(hook = nameof(HandleIdChanged))]
         public int Id;
+
         [SyncVar(hook = nameof(HandleUsernameChanged))]
         public string Username;
+
         [SyncVar(hook = nameof(HandleColorChanged))]
         public Color Color;
+
+        [SyncVar] public bool IsSpawned;
 
         private PlayerProgress _playerProgress;
 
@@ -27,12 +31,24 @@ namespace Game.CodeBase.Player
             IdChanged += (value) => Debug.Log($"New id={value}");
         }
 
+        public override void OnStartClient()
+        {
+            CmdSpawned();
+        }
+
         public void Initialize(int availableId, PlayerProgress playerProgress)
         {
             Id = availableId;
             Username = playerProgress.Username;
             Color = playerProgress.ColorData.Color;
             _playerProgress = playerProgress;
+        }
+
+        [Command]
+        private void CmdSpawned()
+        {
+            IsSpawned = true;
+            Spawned?.Invoke();
         }
 
         [Command]
