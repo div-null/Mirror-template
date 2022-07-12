@@ -1,6 +1,7 @@
 ﻿using System.Threading.Tasks;
 using Game.CodeBase.Game.Lobby;
 using Game.CodeBase.Player;
+using Game.CodeBase.Services;
 using Game.CodeBase.Services.Network;
 using kcp2k;
 using UniRx;
@@ -12,11 +13,14 @@ namespace Game.CodeBase.Infrastructure.States
         private readonly LobbyFactory _lobbyFactory;
         private readonly ServersObserver _serversObserver;
         private readonly AdvancedNetworkManager _networkManager;
+        private readonly PlayerProgressData _playerProgressData;
+
         private Lobby _lobby;
         private CompositeDisposable _disposable;
 
-        public HostLobbyState(LobbyFactory lobbyFactory, ServersObserver serversObserver, AdvancedNetworkManager networkManager)
+        public HostLobbyState(LobbyFactory lobbyFactory, ServersObserver serversObserver, AdvancedNetworkManager networkManager, PlayerProgressData playerProgressData)
         {
+            _playerProgressData = playerProgressData;
             _networkManager = networkManager;
             _serversObserver = serversObserver;
             _lobbyFactory = lobbyFactory;
@@ -35,7 +39,6 @@ namespace Game.CodeBase.Infrastructure.States
 
         private void OnAddPlayer(BasePlayer player)
         {
-            
             _lobby.CreatePlayerAsync(player);
         }
 
@@ -49,7 +52,7 @@ namespace Game.CodeBase.Infrastructure.States
         {
             var lobbyUI = await _lobbyFactory.CreateUI();
             _lobby = await _lobbyFactory.SpawnLobby();
-            _lobby.Initialize(_lobbyFactory, lobbyUI);
+            _lobby.Initialize(_lobbyFactory, lobbyUI, _playerProgressData);
             _networkManager.AddPlayerBuffered.Subscribe(OnAddPlayer).AddTo(_disposable);
         }
     }
