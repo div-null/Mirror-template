@@ -57,7 +57,7 @@ namespace Game.CodeBase.UI
             _startButton.SetActive(isAvailable);
         }
 
-        public void SetupSlot(LobbyPlayer lobbyPlayer, bool isOwner)
+        public void SetupSlot(LobbyPlayer lobbyPlayer)
         {
             BasePlayer basePlayer = lobbyPlayer.BasePlayer;
             int slotId = basePlayer.Id;
@@ -69,9 +69,6 @@ namespace Game.CodeBase.UI
             updateColor(slotId, basePlayer.Color);
             updateUsername(slotId, basePlayer.Username);
             updateReady(slotId, lobbyPlayer.IsReady);
-
-            if (isOwner)
-                SetHostButtons();
         }
 
         private void updateColor(int slotId, Color color)

@@ -35,7 +35,7 @@ namespace Game.CodeBase.Game.Lobby
             // foreach (var lobbyPlayer in _players)
             //     AddPlayer.Execute(lobbyPlayer);
 
-            foreach (var id in _netIds) 
+            foreach (var id in _netIds)
                 StartCoroutine(AwaitLobbyPlayer(id).ToCoroutine());
         }
 
@@ -59,6 +59,9 @@ namespace Game.CodeBase.Game.Lobby
             _factory = factory;
             _lobbyUI = lobbyUI;
             AddPlayerBuffered.Subscribe(SetupPlayer);
+
+            if (isServer)
+                _lobbyUI.SetHostButtons();
         }
 
         public async void CreatePlayerAsync(BasePlayer player, NetworkConnectionToClient conn = null)
@@ -74,10 +77,9 @@ namespace Game.CodeBase.Game.Lobby
         {
             Debug.Log("Setup player", player);
             if (player == null) return;
-            bool isOwner = HasAuthority(player);
-            localClient ??= isOwner ? player : null;
+            localClient ??= HasAuthority(player) ? player : null;
 
-            _lobbyUI.SetupSlot(player, isOwner);
+            _lobbyUI.SetupSlot(player);
         }
 
         private void OnPlayersChanged(SyncList<LobbyPlayer>.Operation op, int _, LobbyPlayer __, LobbyPlayer player)

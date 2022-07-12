@@ -35,9 +35,8 @@ namespace Game.CodeBase.Infrastructure.States
 
         public void Exit()
         {
-            
         }
-        
+
 
         private async void LobbySpawned(Lobby lobby)
         {

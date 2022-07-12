@@ -11,17 +11,17 @@ namespace Game.CodeBase.Player
         public bool IsReady = false;
 
         [SyncVar] public BasePlayer BasePlayer;
-        [SyncVar] private bool _isLeader;
+        [SyncVar] public bool IsLeader;
 
         public void Initialize(BasePlayer basePlayer, bool isLeader)
         {
             BasePlayer = basePlayer;
-            _isLeader = isLeader;
+            IsLeader = isLeader;
         }
 
         public override void OnStartAuthority()
         {
-            CmdSetReadyStatus(_isLeader);
+            CmdSetReadyStatus(IsLeader);
         }
 
         [Command]
