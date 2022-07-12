@@ -641,10 +641,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 638c61f3ae5012548917507e6b045f83, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  ToggleReadyButton: {fileID: 229209105975639767}
   StartGameButton: {fileID: 229209106292894446}
+  ToggleReadyButton: {fileID: 229209105975639767}
   QuitButton: {fileID: 229209105742222076}
-  _startButton: {fileID: 229209106292894448}
+  SearchServersButton: {fileID: 229209107232662521}
   _hostMenuButtons: {fileID: 229209105311480848}
   _clientMenuButtons: {fileID: 229209105920110494}
   _customizationMenu: {fileID: 0}
@@ -654,7 +654,7 @@ MonoBehaviour:
   - {fileID: 7494023617640724469}
   - {fileID: 2829405678949113001}
   usernameInputField: {fileID: 229209105949033853}
-  SetUsername: {fileID: 0}
+  SetUsername: {fileID: 229209105652952093}
 --- !u!1 &229209105601470228
 GameObject:
   m_ObjectHideFlags: 0

@@ -4,6 +4,6 @@
     {
         public const string LobbyPlayer = "NetworkPrefabs/LobbyPlayerPrefab";
         public const string Lobby = "NetworkPrefabs/LobbyPrefab";
-        public const string LobbyUI = "Assets/Prefabs/Lobby/LobbyUIPrefab";
+        public const string LobbyUI = "Lobby/LobbyUIPrefab";
     }
 }
