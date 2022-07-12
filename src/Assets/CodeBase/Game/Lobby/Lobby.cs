@@ -77,7 +77,14 @@ namespace Game.CodeBase.Game.Lobby
         {
             Debug.Log("Setup player", player);
             if (player == null) return;
-            localClient ??= HasAuthority(player) ? player : null;
+            bool hasAuthority = HasAuthority(player);
+            localClient ??= hasAuthority ? player : null;
+            if (hasAuthority)
+            {
+                _lobbyUI.Username.Subscribe(player.BasePlayer.CmdChangeUsername);
+                _lobbyUI.Ready.Subscribe(player.CmdSetReadyStatus);
+                _lobbyUI.Color.Subscribe(player.BasePlayer.CmdSetColor);
+            }
 
             _lobbyUI.SetupSlot(player);
         }

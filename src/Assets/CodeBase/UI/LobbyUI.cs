@@ -9,7 +9,7 @@ namespace Game.CodeBase.UI
     public class LobbyUI : MonoBehaviour
     {
         public ReadOnlyReactiveProperty<string> Username;
-        public ReadOnlyReactiveProperty<Color> Color;
+        public ReactiveCommand<Color> Color;
         public ReadOnlyReactiveProperty<int> Skin;
         public ReadOnlyReactiveProperty<bool> Ready;
 
@@ -29,8 +29,10 @@ namespace Game.CodeBase.UI
 
         [SerializeField] private PlayerSlotUI[] PlayerSlots;
 
+        [Header("Update username")] [SerializeField]
+        private Button SetUsername;
+
         [SerializeField] private TMP_InputField usernameInputField;
-        [SerializeField] private Button SetUsername;
 
 
         private void Awake()
@@ -46,6 +48,8 @@ namespace Game.CodeBase.UI
             onStartGame = new ReactiveCommand();
             onQuit = new ReactiveCommand();
             onSearchServers = new ReactiveCommand();
+
+            Color = new ReactiveCommand<Color>();
 
             StartGameButton.OnClickAsObservable().Subscribe(_ => onStartGame.Execute());
             QuitButton.OnClickAsObservable().Subscribe(_ => onQuit.Execute());
