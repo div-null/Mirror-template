@@ -13,6 +13,7 @@ namespace Game.CodeBase.Game.Lobby
     {
         readonly AsyncLazy<Object> LobbyPlayerTask = UniTask.Lazy(() => Resources.LoadAsync<Object>(AssetPath.LobbyPlayer).ToUniTask());
         readonly AsyncLazy<Object> LobbyUITask = UniTask.Lazy(() => Resources.LoadAsync<Object>(AssetPath.LobbyUI).ToUniTask());
+        readonly AsyncLazy<Object> LobbyTask = UniTask.Lazy(() => Resources.LoadAsync<Object>(AssetPath.Lobby).ToUniTask());
 
         public async UniTask<LobbyPlayer> CreatePlayer(NetworkConnection conn, BasePlayer basePlayer, bool isLeader)
         {
@@ -20,7 +21,7 @@ namespace Game.CodeBase.Game.Lobby
             var lobbyPlayer = Object.Instantiate(playerObj).GetComponent<LobbyPlayer>();
             lobbyPlayer.Initialize(basePlayer, isLeader);
 
-            NetworkServer.Spawn(playerObj, conn);
+            NetworkServer.Spawn(lobbyPlayer.gameObject, conn);
             return lobbyPlayer;
         }
 
@@ -32,7 +33,8 @@ namespace Game.CodeBase.Game.Lobby
 
         public async UniTask<Lobby> SpawnLobby()
         {
-            GameObject gameObject = new GameObject("Server - Lobby");
+            Object lobbyUI = await LobbyTask;
+            GameObject gameObject = (GameObject) GameObject.Instantiate(lobbyUI);
             var lobby = gameObject.GetOrAddComponent<Lobby>();
             NetworkServer.Spawn(gameObject);
             return lobby;
