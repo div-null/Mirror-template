@@ -31,10 +31,6 @@ namespace Game.CodeBase.Infrastructure.States
             _disposable = new CompositeDisposable();
             _networkManager.gameObject.GetComponent<KcpTransport>().Port = server;
 
-            var replay = _networkManager.AddPlayer.Replay(4);
-            replay.Connect().AddTo(_disposable);
-            replay.Subscribe(OnAddPlayer).AddTo(_disposable);
-
             _networkManager.StartHost();
             await InitializeLobby();
 
@@ -43,8 +39,8 @@ namespace Game.CodeBase.Infrastructure.States
 
         private void OnAddPlayer(BasePlayer player)
         {
-            Debug.Log($"Create LobbyPlayer for id={player.Id}");
-            _lobby.CmdCreatePlayer(player);
+            
+            _lobby.CreatePlayerAsync(player);
         }
 
         public void Exit()
@@ -58,6 +54,7 @@ namespace Game.CodeBase.Infrastructure.States
             var lobbyUI = await _lobbyFactory.CreateUI();
             _lobby = await _lobbyFactory.SpawnLobby();
             _lobby.Initialize(_lobbyFactory, lobbyUI);
+            _networkManager.AddPlayerBuffered.Subscribe(OnAddPlayer).AddTo(_disposable);
         }
     }
 }

@@ -14,7 +14,8 @@ namespace Game.CodeBase.Services.Network
     public class AdvancedNetworkManager : NetworkManager, ICoroutineRunner
     {
         public readonly ReactiveCommand<BasePlayer> AddPlayer = new ReactiveCommand<BasePlayer>();
-
+        public IConnectableObservable<BasePlayer> AddPlayerBuffered;
+        
         [Header("Base information")] public int MinConnections = 2;
         [Scene] public string CurrentScene = string.Empty;
 
@@ -36,11 +37,13 @@ namespace Game.CodeBase.Services.Network
         public void Initialize(PlayerFactory playerFactory)
         {
             _playerFactory = playerFactory;
+            AddPlayerBuffered = AddPlayer.Replay(4);
         }
 
         public override void OnStartServer()
         {
             spawnPrefabs = Resources.LoadAll<GameObject>("NetworkPrefabs").ToList();
+            AddPlayerBuffered.Connect();
         }
 
         public override void OnStartClient()
@@ -55,10 +58,7 @@ namespace Game.CodeBase.Services.Network
 
         public override void OnStopServer()
         {
-            foreach (var player in Players)
-            {
-                //if (player != null) player.Destroy();
-            }
+            AddPlayerBuffered = AddPlayer.Replay(4);
         }
 
         /// <summary>

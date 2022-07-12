@@ -1,7 +1,7 @@
-﻿using System.Threading.Tasks;
-using Game.CodeBase.Player;
+﻿using Game.CodeBase.Player;
 using Game.CodeBase.UI;
 using Mirror;
+using UnityEngine;
 
 namespace Game.CodeBase.Game.Lobby
 {
@@ -23,14 +23,16 @@ namespace Game.CodeBase.Game.Lobby
         {
             bool isOwner = HasAuthority(player);
             localClient ??= isOwner ? player : null;
-            
+
             _lobbyUI.SetupSlot(player, isOwner);
         }
 
-        [Command]
-        public void CmdCreatePlayer(BasePlayer player, NetworkConnectionToClient conn = null)
+        public async void CreatePlayerAsync(BasePlayer player, NetworkConnectionToClient conn = null)
         {
-            createPlayerAsync(player, conn);
+            Debug.Log($"Spawn LobbyPlayer for id={player.Id}");
+            bool isHost = HasAuthority(player);
+            LobbyPlayer lobbyPlayer = await _factory.CreatePlayer(conn, player, isHost);
+            _players.Add(lobbyPlayer);
         }
 
         private void OnPlayersChanged(SyncList<LobbyPlayer>.Operation op, int _, LobbyPlayer __, LobbyPlayer player)
@@ -41,15 +43,8 @@ namespace Game.CodeBase.Game.Lobby
             }
         }
 
-        private async Task createPlayerAsync(BasePlayer player, NetworkConnection conn)
-        {
-            bool isHost = this.connectionToServer == conn;
-            LobbyPlayer lobbyPlayer = await _factory.CreatePlayer(conn, player, isHost);
-            _players.Add(lobbyPlayer);
-            // AddPlayer(lobbyPlayer);
-        }
-
-        private bool HasAuthority(LobbyPlayer player) =>
-            connectionToServer == player.connectionToServer;
+        private bool HasAuthority(NetworkBehaviour entity) =>
+            connectionToServer?.connectionId == entity.connectionToServer?.connectionId ||
+            connectionToClient?.connectionId == entity.connectionToClient?.connectionId;
     }
 }
