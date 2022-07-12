@@ -1,34 +1,55 @@
-using System;
 using Game.CodeBase.Player;
 using TMPro;
+using UniRx;
 using UnityEngine;
+using UnityEngine.UI;
 
 namespace Game.CodeBase.UI
 {
     public class LobbyUI : MonoBehaviour
     {
-        public Action<string> UsernameChanged;
-        public Action<Color> ColorChanged;
-        public Action<int> SkinChanged;
-        public Action ReadyChanged;
+        public ReadOnlyReactiveProperty<string> Username;
+        public ReadOnlyReactiveProperty<Color> Color;
+        public ReadOnlyReactiveProperty<int> Skin;
+        public ReadOnlyReactiveProperty<bool> Ready;
 
-        [SerializeField] private GameObject _startButton;
+        [Header("Side buttons")] public ReactiveCommand onStartGame;
+        public ReactiveCommand onSearchServers;
+        public ReactiveCommand onQuit;
+
+        [SerializeField] private Button StartGameButton;
+        [SerializeField] private Button ToggleReadyButton;
+        [SerializeField] private Button QuitButton;
+        [SerializeField] private Button SearchServersButton;
+
 
         [SerializeField] private GameObject _hostMenuButtons;
         [SerializeField] private GameObject _clientMenuButtons;
         [SerializeField] private GameObject _customizationMenu;
 
-        [SerializeField] private TextMeshProUGUI[] UsernameSlots;
-        [SerializeField] private TextMeshProUGUI[] ReadySlots;
+        [SerializeField] private PlayerSlotUI[] PlayerSlots;
 
         [SerializeField] private TMP_InputField usernameInputField;
+        [SerializeField] private Button SetUsername;
 
-        public void StartGame()
-        {
-        }
 
-        public void QuitLobby()
+        private void Awake()
         {
+            Username = SetUsername.OnClickAsObservable()
+                .Select((_) => usernameInputField.text)
+                .ToReadOnlyReactiveProperty();
+
+            Ready = ToggleReadyButton.OnClickAsObservable()
+                .Select(_ => !Ready.Value)
+                .ToReadOnlyReactiveProperty();
+
+            onStartGame = new ReactiveCommand();
+            onQuit = new ReactiveCommand();
+            onSearchServers = new ReactiveCommand();
+
+            StartGameButton.OnClickAsObservable().Subscribe(_ => onStartGame.Execute());
+            QuitButton.OnClickAsObservable().Subscribe(_ => onQuit.Execute());
+            SearchServersButton.OnClickAsObservable().Subscribe(_ => onSearchServers.Execute());
         }
 
         public void SetHostButtons()
@@ -37,53 +58,23 @@ namespace Game.CodeBase.UI
             _clientMenuButtons.SetActive(false);
         }
 
-        public void PressReady()
-        {
-            ReadyChanged?.Invoke();
-        }
-
-        public void PressSetUsername()
-        {
-            string newUsername = usernameInputField.text;
-            if (newUsername != "")
-            {
-                UsernameChanged.Invoke(newUsername);
-                //Как достучаться до локального игрока?
-            }
-        }
-
-        public void SetStartGameButtonAvailability(bool isAvailable)
-        {
-            _startButton.SetActive(isAvailable);
-        }
-
         public void SetupSlot(LobbyPlayer lobbyPlayer)
         {
             BasePlayer basePlayer = lobbyPlayer.BasePlayer;
             int slotId = basePlayer.Id;
+            PlayerSlotUI slot = PlayerSlots[slotId];
 
             basePlayer.ColorChanged += (color) => updateColor(slotId, color);
-            basePlayer.UsernameChanged += (username) => updateUsername(slotId, username);
-            lobbyPlayer.ReadyChanged += (ready) => updateReady(slotId, ready);
+            basePlayer.UsernameChanged += slot.SetNickname;
+            lobbyPlayer.ReadyChanged += slot.SetReady;
 
+            slot.Initialize(basePlayer.Username, lobbyPlayer.IsReady);
             updateColor(slotId, basePlayer.Color);
-            updateUsername(slotId, basePlayer.Username);
-            updateReady(slotId, lobbyPlayer.IsReady);
         }
 
         private void updateColor(int slotId, Color color)
         {
             Debug.Log($"Color updated for {slotId} = {color}");
-        }
-
-        private void updateUsername(int slotId, string newName)
-        {
-            UsernameSlots[slotId].text = newName;
-        }
-
-        private void updateReady(int slotId, bool ready)
-        {
-            ReadySlots[slotId].text = ready ? "Ready" : "Not ready";
         }
     }
 }

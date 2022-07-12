@@ -7,6 +7,7 @@ namespace Game.CodeBase.UI
     {
         public TMP_Text NicknameText;
         public TMP_Text ReadyText;
+        public bool Ready { get; private set; }
 
         public void Initialize(string userName, bool readyState)
         {
@@ -21,7 +22,8 @@ namespace Game.CodeBase.UI
 
         public void SetReady(bool value)
         {
-            ReadyText.text = value ? "Ready" : "Not Ready";
+            Ready = value;
+            ReadyText.text = Ready ? "Ready" : "Not Ready";
         }
     }
 }
