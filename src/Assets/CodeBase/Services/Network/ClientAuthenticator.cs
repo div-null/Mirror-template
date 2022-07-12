@@ -1,6 +1,8 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using Game.CodeBase.Data;
+using JetBrains.Annotations;
 using Mirror;
 using UnityEngine;
 using VContainer;
@@ -35,6 +37,18 @@ namespace Game.CodeBase.Services.Network
         {
             public byte code;
             public string message;
+
+            public static AuthResponseMessage Success() => new()
+            {
+                code = 100,
+                message = "Success"
+            };
+
+            public static AuthResponseMessage FixedName(string updatedName) => new()
+            {
+                code = 101,
+                message = updatedName
+            };
         }
 
         #endregion
@@ -81,38 +95,29 @@ namespace Game.CodeBase.Services.Network
 
             if (connectionsPendingDisconnect.Contains(conn)) return;
 
-            if (!_networkManager.PlayerNames.Contains(msg.Username))
-            {
-                _networkManager.PlayerNames.Add(msg.Username);
+            int nameDuplicates = _networkManager.PlayerNames.Count(name => name.StartsWith(msg.Username));
 
-                // This will be read in Player.OnStartServer
-                conn.authenticationData = new PlayerProgress(msg.Username, msg.Color);
+            var playerProgress = new PlayerProgress(DuplicateName(msg.Username, nameDuplicates), msg.Color);
+            _networkManager.PlayerNames.Add(playerProgress.Username);
 
-                // create and send msg to client so it knows to proceed
-                AuthResponseMessage authResponseMessage = new AuthResponseMessage
-                {
-                    code = 100,
-                    message = "Success"
-                };
+            // This will be read in Player.OnStartServer
+            conn.authenticationData = playerProgress;
 
-                conn.Send(authResponseMessage);
-                ServerAccept(conn);
-            }
-            else
-            {
-                connectionsPendingDisconnect.Add(conn);
+            AuthResponseMessage authResponseMessage = Respond();
 
-                AuthResponseMessage authResponseMessage = new AuthResponseMessage
-                {
-                    code = 200,
-                    message = "Username already in use...try again"
-                };
-
-                conn.Send(authResponseMessage);
-                conn.isAuthenticated = false;
-                StartCoroutine(DelayedDisconnect(conn, 1f));
-            }
+            conn.Send(authResponseMessage);
+            ServerAccept(conn);
         }
+
+        private static AuthResponseMessage Respond([CanBeNull] string updatedName = null)
+        {
+            return updatedName != null
+                ? AuthResponseMessage.FixedName(updatedName)
+                : AuthResponseMessage.Success();
+        }
+
+        private static string DuplicateName(string name, int nameDuplicates) =>
+            nameDuplicates > 0 ? name + $" ({nameDuplicates})" : name;
 
 
         IEnumerator DelayedDisconnect(NetworkConnectionToClient conn, float waitTime)
@@ -170,20 +175,23 @@ namespace Game.CodeBase.Services.Network
         /// <param name="msg">The message payload</param>
         public void OnAuthResponseMessage(AuthResponseMessage msg)
         {
-            if (msg.code == 100)
+            switch (msg.code)
             {
-                Debug.Log($"Authentication Response: {msg.message}");
+                case 100:
+                    Debug.Log($"Authentication Response: Success");
+                    ClientAccept();
+                    break;
+                case 101:
+                    Debug.Log($"Authentication Response: Fixed name");
+                    ClientAccept();
+                    break;
+                default:
+                    Debug.LogError($"Authentication Response: {msg.message}");
 
-                // Authentication has been accepted
-                ClientAccept();
-            }
-            else
-            {
-                Debug.LogError($"Authentication Response: {msg.message}");
+                    NetworkManager.singleton.StopHost();
 
-                NetworkManager.singleton.StopHost();
-
-                Debug.LogError(msg.message);
+                    Debug.LogError(msg.message);
+                    break;
             }
         }
 
