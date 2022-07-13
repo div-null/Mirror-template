@@ -5,6 +5,7 @@ using Game.CodeBase.Services;
 using Game.CodeBase.Services.Network;
 using Mirror;
 using UnityEngine;
+using UnityEngine.Serialization;
 using VContainer;
 using VContainer.Unity;
 
@@ -12,7 +13,8 @@ namespace Game.CodeBase.Infrastructure.Installers
 {
     public class InitialScope : LifetimeScope
     {
-        [SerializeField] private AdvancedNetworkManager _advancedNetworkManagerPrefab;
+        [FormerlySerializedAs("_advancedNetworkManagerPrefab"), SerializeField]
+        private CustomNetworkManager customNetworkManagerPrefab;
 
         private class EntryPoint : IStartable
         {
@@ -43,7 +45,7 @@ namespace Game.CodeBase.Infrastructure.Installers
             builder.RegisterEntryPoint<EntryPoint>();
 
 
-            AdvancedNetworkManager networkManager = Instantiate(_advancedNetworkManagerPrefab);
+            CustomNetworkManager networkManager = Instantiate(customNetworkManagerPrefab);
 
             builder.Register<LobbyFactory>(Lifetime.Singleton);
             builder.Register(_ => new PlayerFactory(networkManager.GetStartPosition(), networkManager.playerPrefab), Lifetime.Singleton);

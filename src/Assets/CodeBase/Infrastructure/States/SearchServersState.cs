@@ -12,14 +12,14 @@ namespace Game.CodeBase.Infrastructure.States
         private readonly string MainMenu = "MainMenu";
 
         private readonly GameStateMachine _stateMachine;
-        private readonly AdvancedNetworkManager _networkManager;
+        private readonly CustomNetworkManager _networkManager;
         private readonly ServersObserver _serversObserver;
         private readonly SceneLoader _sceneLoader;
 
         public SearchServersState(
             GameStateMachine gameStateMachine,
             SceneLoader sceneLoader,
-            AdvancedNetworkManager networkManager,
+            CustomNetworkManager networkManager,
             ServersObserver serversObserver)
         {
             _sceneLoader = sceneLoader;

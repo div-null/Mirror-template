@@ -9,7 +9,7 @@ using VContainer;
 
 namespace Game.CodeBase.Services.Network
 {
-    public class AdvancedNetworkManager : NetworkManager, ICoroutineRunner
+    public class CustomNetworkManager : NetworkManager, ICoroutineRunner
     {
         private const string NetworkPrefabsPath = "NetworkPrefabs";
         public readonly ReactiveCommand<BasePlayer> AddPlayer = new();

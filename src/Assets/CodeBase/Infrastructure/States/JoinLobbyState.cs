@@ -10,7 +10,7 @@ namespace Game.CodeBase.Infrastructure.States
 {
     public class JoinLobbyState : IPayloadedState<ServerInfo>
     {
-        private readonly AdvancedNetworkManager _networkManager;
+        private readonly CustomNetworkManager _networkManager;
         private readonly LobbyFactory _lobbyFactory;
         private readonly PlayerProgressData _playerProgressData;
         
@@ -18,7 +18,7 @@ namespace Game.CodeBase.Infrastructure.States
         private LobbyUI _lobbyUI;
         private IObservable<Lobby> _networkingSynced;
 
-        public JoinLobbyState(LobbyFactory lobbyFactory, AdvancedNetworkManager networkManager, PlayerProgressData playerProgressData)
+        public JoinLobbyState(LobbyFactory lobbyFactory, CustomNetworkManager networkManager, PlayerProgressData playerProgressData)
         {
             _playerProgressData = playerProgressData;
             _lobbyFactory = lobbyFactory;

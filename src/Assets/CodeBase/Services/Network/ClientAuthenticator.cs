@@ -11,18 +11,18 @@ using VContainer;
 
 namespace Game.CodeBase.Services.Network
 {
-    [RequireComponent(typeof(AdvancedNetworkManager))]
+    [RequireComponent(typeof(CustomNetworkManager))]
     public class ClientAuthenticator : NetworkAuthenticator
     {
         private readonly HashSet<NetworkConnection> _connectionsPendingDisconnect = new HashSet<NetworkConnection>();
         private readonly NetworkConnection[] _connectedClients = new NetworkConnection[Constants.MaxPlayers];
 
         private PlayerProgressData _progressService;
-        private AdvancedNetworkManager _networkManager;
+        private CustomNetworkManager _networkManager;
 
 
         [Inject]
-        public void Initialize(AdvancedNetworkManager networkManager, PlayerProgressData progressData)
+        public void Initialize(CustomNetworkManager networkManager, PlayerProgressData progressData)
         {
             _networkManager = networkManager;
             _progressService = progressData;

@@ -12,13 +12,13 @@ namespace Game.CodeBase.Infrastructure.States
     {
         private readonly LobbyFactory _lobbyFactory;
         private readonly ServersObserver _serversObserver;
-        private readonly AdvancedNetworkManager _networkManager;
+        private readonly CustomNetworkManager _networkManager;
         private readonly PlayerProgressData _playerProgressData;
 
         private Lobby _lobby;
         private CompositeDisposable _disposable;
 
-        public HostLobbyState(LobbyFactory lobbyFactory, ServersObserver serversObserver, AdvancedNetworkManager networkManager, PlayerProgressData playerProgressData)
+        public HostLobbyState(LobbyFactory lobbyFactory, ServersObserver serversObserver, CustomNetworkManager networkManager, PlayerProgressData playerProgressData)
         {
             _playerProgressData = playerProgressData;
             _networkManager = networkManager;
