@@ -13,9 +13,9 @@ namespace Game.CodeBase.UI
         public ReadOnlyReactiveProperty<int> Skin;
         public ReadOnlyReactiveProperty<bool> Ready;
 
-        [Header("Side buttons")] public ReactiveCommand onStartGame;
-        public ReactiveCommand onSearchServers;
-        public ReactiveCommand onQuit;
+        [Header("Side buttons")] public ReactiveCommand OnStartGame;
+        public ReactiveCommand OnSearchServers;
+        public ReactiveCommand OnQuit;
 
         [SerializeField] private Button StartGameButton;
         [SerializeField] private Button ToggleReadyButton;
@@ -45,15 +45,15 @@ namespace Game.CodeBase.UI
                 .Select(_ => !Ready.Value)
                 .ToReadOnlyReactiveProperty();
 
-            onStartGame = new ReactiveCommand();
-            onQuit = new ReactiveCommand();
-            onSearchServers = new ReactiveCommand();
+            OnStartGame = new ReactiveCommand();
+            OnQuit = new ReactiveCommand();
+            OnSearchServers = new ReactiveCommand();
 
             Color = new ReactiveCommand<Color>();
 
-            StartGameButton.OnClickAsObservable().Subscribe(_ => onStartGame.Execute());
-            QuitButton.OnClickAsObservable().Subscribe(_ => onQuit.Execute());
-            SearchServersButton.OnClickAsObservable().Subscribe(_ => onSearchServers.Execute());
+            StartGameButton.OnClickAsObservable().Subscribe(_ => OnStartGame.Execute());
+            QuitButton.OnClickAsObservable().Subscribe(_ => OnQuit.Execute());
+            SearchServersButton.OnClickAsObservable().Subscribe(_ => OnSearchServers.Execute());
         }
 
         public void SetHostButtons()

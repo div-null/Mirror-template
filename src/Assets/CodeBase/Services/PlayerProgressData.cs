@@ -8,13 +8,13 @@ namespace Game.CodeBase.Services
     public class PlayerProgressData
     {
         private const string PlayerProgressPath = "playerProgress";
-        public PlayerProgress Progress => backing.Value;
+        public PlayerProgress Progress => _backing.Value;
 
-        private Lazy<PlayerProgress> backing;
+        private Lazy<PlayerProgress> _backing;
 
         public PlayerProgressData()
         {
-            backing = new Lazy<PlayerProgress>(LoadOrGenerate);
+            _backing = new Lazy<PlayerProgress>(LoadOrGenerate);
         }
 
         private PlayerProgress LoadOrGenerate()
@@ -32,7 +32,7 @@ namespace Game.CodeBase.Services
         public void SetPlayerProgress(PlayerProgress progress)
         {
             SavePlayerProgress(progress);
-            backing = new Lazy<PlayerProgress>(LoadOrGenerate);
+            _backing = new Lazy<PlayerProgress>(LoadOrGenerate);
         }
 
         private PlayerProgress LoadPlayerProgress()

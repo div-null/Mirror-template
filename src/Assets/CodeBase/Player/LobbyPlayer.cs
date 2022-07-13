@@ -16,7 +16,7 @@ namespace Game.CodeBase.Player
         public ReactiveCommand<bool> ReadyChanged;
 
         [SyncVar(hook = nameof(HandleReadyChanged))]
-        public bool IsReady = false;
+        public bool IsReady;
 
         [SyncVar] public BasePlayer BasePlayer;
         [SyncVar] public bool IsLeader;
@@ -53,7 +53,7 @@ namespace Game.CodeBase.Player
         private void CmdSetReadyStatus(bool isReady) =>
             ReadyChanged.Execute(IsReady = isReady);
 
-        private void HandleReadyChanged(bool old, bool @new) =>
+        private void HandleReadyChanged(bool _, bool @new) =>
             ReadyChanged.Execute(@new);
     }
 }

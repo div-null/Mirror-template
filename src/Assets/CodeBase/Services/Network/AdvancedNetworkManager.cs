@@ -1,8 +1,6 @@
 using System;
-using System.Collections.Generic;
 using System.Linq;
 using Game.CodeBase.Game;
-using Game.CodeBase.Infrastructure;
 using Game.CodeBase.Player;
 using Mirror;
 using UniRx;
@@ -13,20 +11,21 @@ namespace Game.CodeBase.Services.Network
 {
     public class AdvancedNetworkManager : NetworkManager, ICoroutineRunner
     {
-        public readonly ReactiveCommand<BasePlayer> AddPlayer = new ReactiveCommand<BasePlayer>();
+        private const string NetworkPrefabsPath = "NetworkPrefabs";
+        public readonly ReactiveCommand<BasePlayer> AddPlayer = new();
         public IConnectableObservable<BasePlayer> AddPlayerBuffered;
         
         [Header("Base information")] public int MinConnections = 2;
         [Scene] public string CurrentScene = string.Empty;
 
-        public bool ConnectToAvailableServerAutomatically = false;
+        public bool ConnectToAvailableServerAutomatically;
 
-        public BasePlayer[] Players { get; } = new BasePlayer[4];
+        public BasePlayer[] Players { get; } = new BasePlayer[Constants.MaxPlayers];
 
         private PlayerFactory _playerFactory;
 
-        public event Action<NetworkConnection> OnClientConnected;
-        public event Action<NetworkConnection> OnClientDisconnected;
+        public event Action OnClientConnected;
+        public event Action OnClientDisconnected;
 
 
         [Inject]
@@ -38,13 +37,13 @@ namespace Game.CodeBase.Services.Network
 
         public override void OnStartServer()
         {
-            spawnPrefabs = Resources.LoadAll<GameObject>("NetworkPrefabs").ToList();
+            spawnPrefabs = Resources.LoadAll<GameObject>(NetworkPrefabsPath).ToList();
             AddPlayerBuffered.Connect();
         }
 
         public override void OnStartClient()
         {
-            var spawnableObjects = Resources.LoadAll<GameObject>("NetworkPrefabs");
+            var spawnableObjects = Resources.LoadAll<GameObject>(NetworkPrefabsPath);
 
             foreach (var obj in spawnableObjects)
             {
@@ -66,12 +65,10 @@ namespace Game.CodeBase.Services.Network
         /// Called on the client when connected to a server.
         /// <para>The default implementation of this function sets the client as ready and adds a player. Override the function to dictate what happens when the client connects.</para>
         /// </summary>
-        /// <param name="conn">Connection to the server.</param>
-        public override void OnClientConnect(NetworkConnection conn)
+        public override void OnClientConnect()
         {
-            base.OnClientConnect(conn);
-
-            OnClientConnected?.Invoke(conn);
+            base.OnClientConnect();
+            OnClientConnected?.Invoke();
         }
 
         /// <summary>
@@ -96,12 +93,10 @@ namespace Game.CodeBase.Services.Network
         /// Called on clients when disconnected from a server.
         /// <para>This is called on the client when it disconnects from the server. Override this function to decide what happens when the client disconnects.</para>
         /// </summary>
-        /// <param name="conn">Connection to the server.</param>
-        public override void OnClientDisconnect(NetworkConnection conn)
+        public override void OnClientDisconnect()
         {
-            base.OnClientDisconnect(conn);
-
-            OnClientDisconnected?.Invoke(conn);
+            base.OnClientDisconnect();
+            OnClientDisconnected?.Invoke();
         }
 
         /// <summary>

@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using Game.CodeBase.Data;
+using Game.CodeBase.Game;
 using JetBrains.Annotations;
 using Mirror;
 using Unity.VisualScripting;
@@ -10,12 +11,13 @@ using VContainer;
 
 namespace Game.CodeBase.Services.Network
 {
+    [RequireComponent(typeof(AdvancedNetworkManager))]
     public class ClientAuthenticator : NetworkAuthenticator
     {
-        readonly HashSet<NetworkConnection> connectionsPendingDisconnect = new HashSet<NetworkConnection>();
-        private readonly NetworkConnection[] connectedClients = new NetworkConnection[4];
+        private readonly HashSet<NetworkConnection> _connectionsPendingDisconnect = new HashSet<NetworkConnection>();
+        private readonly NetworkConnection[] _connectedClients = new NetworkConnection[Constants.MaxPlayers];
 
-        public PlayerProgressData _progressService;
+        private PlayerProgressData _progressService;
         private AdvancedNetworkManager _networkManager;
 
 
@@ -36,19 +38,19 @@ namespace Game.CodeBase.Services.Network
 
         public struct AuthResponseMessage : NetworkMessage
         {
-            public byte code;
-            public string message;
+            public byte Code;
+            public string Message;
 
             public static AuthResponseMessage Success() => new()
             {
-                code = 100,
-                message = "Success"
+                Code = 100,
+                Message = "Success"
             };
 
             public static AuthResponseMessage FixedName(string updatedName) => new()
             {
-                code = 101,
-                message = updatedName
+                Code = 101,
+                Message = updatedName
             };
         }
 
@@ -94,7 +96,7 @@ namespace Game.CodeBase.Services.Network
         {
             Debug.Log($"Authentication Request: {msg.Username}");
 
-            if (connectionsPendingDisconnect.Contains(conn)) return;
+            if (_connectionsPendingDisconnect.Contains(conn)) return;
 
             int nameDuplicates = _networkManager.Players
                 .NotNull()
@@ -129,7 +131,7 @@ namespace Game.CodeBase.Services.Network
             ServerReject(conn);
 
             yield return null;
-            connectionsPendingDisconnect.Remove(conn);
+            _connectionsPendingDisconnect.Remove(conn);
         }
 
         #endregion
@@ -177,7 +179,7 @@ namespace Game.CodeBase.Services.Network
         /// <param name="msg">The message payload</param>
         public void OnAuthResponseMessage(AuthResponseMessage msg)
         {
-            switch (msg.code)
+            switch (msg.Code)
             {
                 case 100:
                     Debug.Log($"Authentication Response: Success");
@@ -188,11 +190,11 @@ namespace Game.CodeBase.Services.Network
                     ClientAccept();
                     break;
                 default:
-                    Debug.LogError($"Authentication Response: {msg.message}");
+                    Debug.LogError($"Authentication Response: {msg.Message}");
 
                     NetworkManager.singleton.StopHost();
 
-                    Debug.LogError(msg.message);
+                    Debug.LogError(msg.Message);
                     break;
             }
         }

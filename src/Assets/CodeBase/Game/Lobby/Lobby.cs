@@ -20,7 +20,7 @@ namespace Game.CodeBase.Game.Lobby
         private readonly SyncList<uint> _netIds = new SyncList<uint>();
 
         private LobbyUI _lobbyUI;
-        private LobbyPlayer localClient;
+        private LobbyPlayer _localClient;
         private LobbyFactory _factory;
         private PlayerProgressData _playerProgressData;
 
@@ -68,7 +68,7 @@ namespace Game.CodeBase.Game.Lobby
 
             if (HasAuthority(player))
             {
-                localClient = player;
+                _localClient = player;
                 _lobbyUI.Username.Subscribe(StoreUsername);
                 _lobbyUI.Username.Subscribe(player.SetUsername);
                 _lobbyUI.Ready.Subscribe(player.SetReady);

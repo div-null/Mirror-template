@@ -1,11 +1,10 @@
 ﻿using System;
 using System.Collections;
-using System.Threading.Tasks;
 using Cysharp.Threading.Tasks;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
-namespace Game.CodeBase.Infrastructure
+namespace Game.CodeBase.Services
 {
     public class SceneLoader
     {

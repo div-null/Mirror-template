@@ -4,7 +4,6 @@ using Game.CodeBase.Infrastructure.States;
 using Game.CodeBase.Services;
 using Game.CodeBase.Services.Network;
 using Mirror;
-using Mirror.Discovery;
 using UnityEngine;
 using VContainer;
 using VContainer.Unity;
@@ -15,7 +14,7 @@ namespace Game.CodeBase.Infrastructure.Installers
     {
         [SerializeField] private AdvancedNetworkManager _advancedNetworkManagerPrefab;
 
-        class EntryPoint : IStartable
+        private class EntryPoint : IStartable
         {
             private readonly InitialScope _scope;
 

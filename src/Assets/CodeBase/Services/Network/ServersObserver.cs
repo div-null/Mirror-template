@@ -1,8 +1,6 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
-using Game.CodeBase.Infrastructure;
-using Mirror.Discovery;
 using UnityEngine;
 
 namespace Game.CodeBase.Services.Network

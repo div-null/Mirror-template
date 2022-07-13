@@ -7,13 +7,7 @@ namespace Game.CodeBase.Player
     {
         [SerializeField] private CharacterController _characterController;
         [SerializeField] private Animator _animator;
-
-        private void Start()
-        {
-            // if (hasAuthority)
-            //     InputListener.Instance.Move += Move;
-        }
-
+        
         private void Move(Vector2 inputVector)
         {
             if (inputVector != Vector2.zero)

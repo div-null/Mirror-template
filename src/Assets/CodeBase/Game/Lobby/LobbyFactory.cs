@@ -11,13 +11,13 @@ namespace Game.CodeBase.Game.Lobby
 {
     public class LobbyFactory
     {
-        readonly AsyncLazy<Object> LobbyPlayerTask = UniTask.Lazy(() => Resources.LoadAsync<Object>(AssetPath.LobbyPlayer).ToUniTask());
-        readonly AsyncLazy<Object> LobbyUITask = UniTask.Lazy(() => Resources.LoadAsync<Object>(AssetPath.LobbyUI).ToUniTask());
-        readonly AsyncLazy<Object> LobbyTask = UniTask.Lazy(() => Resources.LoadAsync<Object>(AssetPath.Lobby).ToUniTask());
+        private readonly AsyncLazy<Object> _lobbyPlayerTask = UniTask.Lazy(() => Resources.LoadAsync<Object>(AssetPath.LobbyPlayer).ToUniTask());
+        private readonly AsyncLazy<Object> _lobbyUITask = UniTask.Lazy(() => Resources.LoadAsync<Object>(AssetPath.LobbyUI).ToUniTask());
+        private readonly AsyncLazy<Object> _lobbyTask = UniTask.Lazy(() => Resources.LoadAsync<Object>(AssetPath.Lobby).ToUniTask());
 
         public async UniTask<LobbyPlayer> CreatePlayer(NetworkConnection conn, BasePlayer basePlayer, bool isLeader)
         {
-            var playerObj = (GameObject) await LobbyPlayerTask;
+            var playerObj = (GameObject) await _lobbyPlayerTask;
             var lobbyPlayer = Object.Instantiate(playerObj).GetComponent<LobbyPlayer>();
             lobbyPlayer.Initialize(basePlayer, isLeader);
 
@@ -27,14 +27,14 @@ namespace Game.CodeBase.Game.Lobby
 
         public async UniTask<LobbyUI> CreateUI()
         {
-            Object lobbyUI = await LobbyUITask;
+            Object lobbyUI = await _lobbyUITask;
             return Object.Instantiate(lobbyUI).GetComponent<LobbyUI>();
         }
 
         public async UniTask<Lobby> SpawnLobby()
         {
-            Object lobbyUI = await LobbyTask;
-            GameObject gameObject = (GameObject) GameObject.Instantiate(lobbyUI);
+            Object lobbyUI = await _lobbyTask;
+            var gameObject = (GameObject) Object.Instantiate(lobbyUI);
             var lobby = gameObject.GetOrAddComponent<Lobby>();
             NetworkServer.Spawn(gameObject);
             return lobby;

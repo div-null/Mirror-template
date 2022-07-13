@@ -1,12 +1,13 @@
 ﻿using System;
+using Game.CodeBase.Game;
 
 namespace Game.CodeBase.Services.Network
 {
     public interface INetworkDiscovery
     {
         event Action<ServerInfo> OnServerFound;
-        void Initialize(string serverName, int playersCount = 1, int maxPlayers = 4);
-        void UpdatePlayersCount(int playersCount, int maxPlayers = 4);
+        void Initialize(string serverName, int playersCount = 1, int maxPlayers = Constants.MaxPlayers);
+        void UpdatePlayersCount(int playersCount, int maxPlayers = Constants.MaxPlayers);
 
         /// <summary>
         /// Advertise this server in the local network
