@@ -1,5 +1,6 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using CodeBase.Shared;
 using Mirror;
 using UnityEngine;
@@ -20,10 +21,15 @@ namespace Game.CodeBase.Services.Network
         private IAuthRequestProvider _requestProvider;
 
         [Inject]
-        public void Initialize(CustomNetworkManager networkManager, PlayerProgressData progressData)
+        public void Initialize(CustomNetworkManager networkManager,
+            PlayerProgressData progressData,
+            IAuthRequestProvider requestProvider,
+            IEnumerable<IAuthRequestHandler> requestHandlers)
         {
             _networkManager = networkManager;
             _progressService = progressData;
+            _requestProvider = requestProvider;
+            _requestHandlers = requestHandlers.ToArray();
         }
 
         #region Messages

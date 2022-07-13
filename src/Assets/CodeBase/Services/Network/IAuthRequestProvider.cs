@@ -1,6 +1,6 @@
 ﻿namespace Game.CodeBase.Services.Network
 {
-    internal interface IAuthRequestProvider
+    public interface IAuthRequestProvider
     {
         ClientAuthenticator.AuthRequestMessage Request();
     }

@@ -4,9 +4,14 @@ using Game.CodeBase.Services.Network;
 
 namespace Game.CodeBase.Infrastructure.ConnectionHandlers
 {
-    class AuthRequestProvider : IAuthRequestProvider
+    public sealed class AuthRequestProvider : IAuthRequestProvider
     {
-        private PlayerProgressData _progressService;
+        private readonly PlayerProgressData _progressService;
+
+        public AuthRequestProvider(PlayerProgressData progressService)
+        {
+            _progressService = progressService;
+        }
 
         public ClientAuthenticator.AuthRequestMessage Request()
         {

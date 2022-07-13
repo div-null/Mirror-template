@@ -7,9 +7,9 @@ using Unity.VisualScripting;
 
 namespace Game.CodeBase.Infrastructure.ConnectionHandlers
 {
-    public class DuplicateNameHandler : IAuthRequestHandler
+    public sealed class DuplicateNameHandler : IAuthRequestHandler
     {
-        private CustomNetworkManager _networkManager;
+        private readonly CustomNetworkManager _networkManager;
 
         public DuplicateNameHandler(CustomNetworkManager networkManager)
         {

@@ -1,8 +1,10 @@
 ﻿using Game.CodeBase.Game;
 using Game.CodeBase.Game.Lobby;
+using Game.CodeBase.Infrastructure.ConnectionHandlers;
 using Game.CodeBase.Infrastructure.States;
 using Game.CodeBase.Services;
 using Game.CodeBase.Services.Network;
+
 using Mirror;
 using UnityEngine;
 using UnityEngine.Serialization;
@@ -44,6 +46,8 @@ namespace Game.CodeBase.Infrastructure.Installers
             builder.Register<MainInputActions>(Lifetime.Singleton);
             builder.RegisterEntryPoint<EntryPoint>();
 
+            builder.Register<AuthRequestProvider>(Lifetime.Singleton).AsImplementedInterfaces();
+            builder.Register<DuplicateNameHandler>(Lifetime.Singleton).AsImplementedInterfaces();
 
             CustomNetworkManager networkManager = Instantiate(customNetworkManagerPrefab);
 
