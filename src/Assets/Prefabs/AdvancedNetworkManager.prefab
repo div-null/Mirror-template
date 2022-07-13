@@ -62,9 +62,6 @@ MonoBehaviour:
   playerSpawnMethod: 0
   spawnPrefabs: []
   MinConnections: 2
-  CurrentScene: 
-  ConnectToAvailableServerAutomatically: 1
-  PlayerNames: []
 --- !u!114 &8085879731823230668
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -128,4 +125,3 @@ MonoBehaviour:
   serverBroadcastListenPort: 47777
   enableActiveDiscovery: 1
   ActiveDiscoveryInterval: 3
-  transport: {fileID: 0}
