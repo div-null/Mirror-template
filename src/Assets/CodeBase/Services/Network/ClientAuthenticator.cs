@@ -14,20 +14,12 @@ namespace Game.CodeBase.Services.Network
         private readonly HashSet<NetworkConnection> _connectionsPendingDisconnect = new HashSet<NetworkConnection>();
         private readonly NetworkConnection[] _connectedClients = new NetworkConnection[Constants.MaxPlayers];
 
-        private PlayerProgressData _progressService;
-        private CustomNetworkManager _networkManager;
-
         private IAuthRequestHandler[] _requestHandlers;
         private IAuthRequestProvider _requestProvider;
 
         [Inject]
-        public void Initialize(CustomNetworkManager networkManager,
-            PlayerProgressData progressData,
-            IAuthRequestProvider requestProvider,
-            IEnumerable<IAuthRequestHandler> requestHandlers)
+        public void Initialize(IAuthRequestProvider requestProvider, IEnumerable<IAuthRequestHandler> requestHandlers)
         {
-            _networkManager = networkManager;
-            _progressService = progressData;
             _requestProvider = requestProvider;
             _requestHandlers = requestHandlers.ToArray();
         }
