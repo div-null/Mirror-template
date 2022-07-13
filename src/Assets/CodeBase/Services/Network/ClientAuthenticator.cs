@@ -1,7 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
-using CodeBase.Shared;
+using Game.CodeBase.Shared;
 using Mirror;
 using UnityEngine;
 using VContainer;

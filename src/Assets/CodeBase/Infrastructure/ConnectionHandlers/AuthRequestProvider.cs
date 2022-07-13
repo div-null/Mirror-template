@@ -1,4 +1,4 @@
-﻿using CodeBase.Model;
+﻿using Game.CodeBase.Model;
 using Game.CodeBase.Services;
 using Game.CodeBase.Services.Network;
 

@@ -1,4 +1,4 @@
-﻿namespace CodeBase.Shared
+﻿namespace Game.CodeBase.Shared
 {
     public class Constants
     {

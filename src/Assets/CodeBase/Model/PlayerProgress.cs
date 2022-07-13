@@ -3,7 +3,7 @@ using Newtonsoft.Json;
 using UnityEngine;
 using Random = System.Random;
 
-namespace CodeBase.Model
+namespace Game.CodeBase.Model
 {
     [Serializable]
     public class PlayerProgress

@@ -2,9 +2,8 @@
 using JetBrains.Annotations;
 using Mirror;
 using Unity.VisualScripting;
-
-using CodeBase.Model;
 using Game.CodeBase.Game;
+using Game.CodeBase.Model;
 using Game.CodeBase.Services.Network;
 
 namespace Game.CodeBase.Infrastructure.ConnectionHandlers

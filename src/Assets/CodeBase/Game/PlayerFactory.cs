@@ -1,4 +1,4 @@
-﻿using CodeBase.Model;
+﻿using Game.CodeBase.Model;
 using Game.CodeBase.Player;
 using Mirror;
 using UnityEngine;

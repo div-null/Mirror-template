@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace CodeBase.Model
+namespace Game.CodeBase.Model
 {
     [Serializable]
     public class ItemsData

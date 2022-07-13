@@ -1,6 +1,6 @@
 ﻿using System;
-using CodeBase.Model;
 using Cysharp.Threading.Tasks;
+using Game.CodeBase.Model;
 using Game.CodeBase.Player;
 using Game.CodeBase.Services;
 using Game.CodeBase.UI;

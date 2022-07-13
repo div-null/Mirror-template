@@ -2,9 +2,9 @@
 using Mirror;
 using UniRx;
 using UnityEngine;
-using CodeBase.Shared;
 using Game.CodeBase.Player;
 using Game.CodeBase.Services.Network;
+using Game.CodeBase.Shared;
 
 namespace Game.CodeBase.Game
 {

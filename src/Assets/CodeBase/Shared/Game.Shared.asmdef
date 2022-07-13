@@ -1,3 +1,14 @@
-﻿{
-  "name": "Game_Shared"
+{
+    "name": "Game_Shared",
+    "rootNamespace": "Game",
+    "references": [],
+    "includePlatforms": [],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": true,
+    "defineConstraints": [],
+    "versionDefines": [],
+    "noEngineReferences": false
 }
