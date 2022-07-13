@@ -1,11 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
-using System.Linq;
-using CodeBase.Model;
-using Game.CodeBase.Game;
-using JetBrains.Annotations;
+using CodeBase.Shared;
 using Mirror;
-using Unity.VisualScripting;
 using UnityEngine;
 using VContainer;
 
@@ -20,6 +16,8 @@ namespace Game.CodeBase.Services.Network
         private PlayerProgressData _progressService;
         private CustomNetworkManager _networkManager;
 
+        private IAuthRequestHandler[] _requestHandlers;
+        private IAuthRequestProvider _requestProvider;
 
         [Inject]
         public void Initialize(CustomNetworkManager networkManager, PlayerProgressData progressData)
@@ -98,30 +96,19 @@ namespace Game.CodeBase.Services.Network
 
             if (_connectionsPendingDisconnect.Contains(conn)) return;
 
-            int nameDuplicates = _networkManager.Players
-                .NotNull()
-                .Count(player => player.Username.StartsWith(msg.Username));
+            foreach (var handler in _requestHandlers)
+            {
+                if (!handler.Accept(conn, msg, out AuthResponseMessage response))
+                {
+                    conn.Send(response);
+                    StartCoroutine(DelayedDisconnect(conn, 1));
+                    return;
+                }
+            }
 
-            var playerProgress = new PlayerProgress(DuplicateName(msg.Username, nameDuplicates), msg.Color);
-
-            // This will be read in Player.OnStartServer
-            conn.authenticationData = playerProgress;
-
-            AuthResponseMessage authResponseMessage = Respond();
-
-            conn.Send(authResponseMessage);
+            conn.Send(AuthResponseMessage.Success());
             ServerAccept(conn);
         }
-
-        private static AuthResponseMessage Respond([CanBeNull] string updatedName = null)
-        {
-            return updatedName != null
-                ? AuthResponseMessage.FixedName(updatedName)
-                : AuthResponseMessage.Success();
-        }
-
-        private static string DuplicateName(string name, int nameDuplicates) =>
-            nameDuplicates > 0 ? name + $" ({nameDuplicates})" : name;
 
 
         IEnumerator DelayedDisconnect(NetworkConnectionToClient conn, float waitTime)
@@ -163,13 +150,7 @@ namespace Game.CodeBase.Services.Network
         /// </summary>
         public override void OnClientAuthenticate()
         {
-            PlayerProgress progress = _progressService.Progress;
-            AuthRequestMessage authRequestMessage = new AuthRequestMessage
-            {
-                Username = progress.Username,
-                Color = progress.ColorData.Color
-            };
-
+            AuthRequestMessage authRequestMessage = _requestProvider.Request();
             NetworkClient.connection.Send(authRequestMessage);
         }
 
