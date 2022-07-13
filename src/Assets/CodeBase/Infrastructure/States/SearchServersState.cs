@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
+using Game.CodeBase.Game;
 using Game.CodeBase.Infrastructure.States.CodeBase.Infrastructure.States;
 using Game.CodeBase.Services;
 using Game.CodeBase.Services.Network;
@@ -12,19 +13,19 @@ namespace Game.CodeBase.Infrastructure.States
         private readonly string MainMenu = "MainMenu";
 
         private readonly GameStateMachine _stateMachine;
-        private readonly CustomNetworkManager _networkManager;
         private readonly ServersObserver _serversObserver;
         private readonly SceneLoader _sceneLoader;
+        private readonly GameState _gameState;
 
         public SearchServersState(
             GameStateMachine gameStateMachine,
             SceneLoader sceneLoader,
-            CustomNetworkManager networkManager,
+            GameState gameState,
             ServersObserver serversObserver)
         {
             _sceneLoader = sceneLoader;
             _stateMachine = gameStateMachine;
-            _networkManager = networkManager;
+            _gameState = gameState;
             _serversObserver = serversObserver;
             _serversObserver.FoundServers += JoinOrHost;
         }
@@ -45,7 +46,7 @@ namespace Game.CodeBase.Infrastructure.States
                 return;
             }
 
-            if (_networkManager.ConnectToAvailableServerAutomatically)
+            if (_gameState.ConnectToAvailableServerAutomatically)
             {
                 Debug.Log("Start client");
                 var firstServerInfo = foundServers.First().Value;

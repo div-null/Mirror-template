@@ -1,47 +1,24 @@
 using System;
 using System.Linq;
-using CodeBase.Shared;
-using Game.CodeBase.Game;
-using Game.CodeBase.Player;
 using Mirror;
-using UniRx;
 using UnityEngine;
-using VContainer;
 
 namespace Game.CodeBase.Services.Network
 {
     public class CustomNetworkManager : NetworkManager, ICoroutineRunner
     {
         private const string NetworkPrefabsPath = "NetworkPrefabs";
-        public readonly ReactiveCommand<BasePlayer> AddPlayer = new();
-        public IConnectableObservable<BasePlayer> AddPlayerBuffered;
-        
+
         [Header("Base information")] public int MinConnections = 2;
-        [Scene] public string CurrentScene = string.Empty;
-
-        public bool ConnectToAvailableServerAutomatically;
-
-        public BasePlayer[] Players { get; } = new BasePlayer[Constants.MaxPlayers];
-
-        public string ServerName { get; private set; } = "Server";
-
-        private PlayerFactory _playerFactory;
 
         public event Action OnClientConnected;
+        public event Action<NetworkConnectionToClient> OnSpawnClient;
         public event Action OnClientDisconnected;
 
-
-        [Inject]
-        public void Initialize(PlayerFactory playerFactory)
-        {
-            _playerFactory = playerFactory;
-            AddPlayerBuffered = AddPlayer.Replay(4);
-        }
 
         public override void OnStartServer()
         {
             spawnPrefabs = Resources.LoadAll<GameObject>(NetworkPrefabsPath).ToList();
-            AddPlayerBuffered.Connect();
         }
 
         public override void OnStartClient()
@@ -49,14 +26,12 @@ namespace Game.CodeBase.Services.Network
             var spawnableObjects = Resources.LoadAll<GameObject>(NetworkPrefabsPath);
 
             foreach (var obj in spawnableObjects)
-            {
                 NetworkClient.RegisterPrefab(obj);
-            }
         }
 
         public override void OnStopServer()
         {
-            AddPlayerBuffered = AddPlayer.Replay(4);
+            base.OnStopServer();
         }
 
         public override void OnApplicationQuit()
@@ -79,18 +54,8 @@ namespace Game.CodeBase.Services.Network
         /// <para>The default implementation for this function creates a new player object from the playerPrefab.</para>
         /// </summary>
         /// <param name="conn">Connection from client.</param>
-        public override void OnServerAddPlayer(NetworkConnectionToClient conn)
-        {
-            int availableId = GetAvailableId();
-            if (availableId != -1)
-            {
-                BasePlayer player = _playerFactory.CreatePlayer(conn, availableId);
-                Players[availableId] = player;
-
-                NetworkServer.AddPlayerForConnection(conn, player.gameObject);
-                AddPlayer.Execute(player);
-            }
-        }
+        public override void OnServerAddPlayer(NetworkConnectionToClient conn) => 
+            OnSpawnClient?.Invoke(conn);
 
         /// <summary>
         /// Called on clients when disconnected from a server.
@@ -115,18 +80,7 @@ namespace Game.CodeBase.Services.Network
             }
         }
 
-        public int GetAvailableId()
-        {
-            for (int i = 0; i < 4; i++)
-            {
-                if (Players[i] == null)
-                    return i;
-            }
 
-
-            Debug.Log("Its not empty!");
-            return -1;
-        }
 
         /// <summary>
         /// Called on the server when a client disconnects.

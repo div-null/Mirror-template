@@ -1,20 +1,22 @@
 ﻿using System;
 using System.Linq;
 using System.Net;
-using Game.CodeBase.Services.Network;
 using Mirror;
 using UnityEngine;
+
+using Game.CodeBase.Game;
+using Game.CodeBase.Services.Network;
 
 namespace Game.CodeBase.Infrastructure
 {
     class ServerNotifier : IServerNotifier
     {
         private readonly Transport _transport;
-        private readonly CustomNetworkManager _networkManager;
+        private readonly GameState _gameState;
 
-        public ServerNotifier(CustomNetworkManager networkManager)
+        public ServerNotifier(GameState gameState)
         {
-            _networkManager = networkManager;
+            _gameState = gameState;
             _transport = Transport.activeTransport;
         }
 
@@ -28,9 +30,9 @@ namespace Game.CodeBase.Infrastructure
                 {
                     ServerId = serverId,
                     Uri = _transport.ServerUri(),
-                    ServerName = _networkManager.ServerName,
-                    MaxPlayers = _networkManager.maxConnections,
-                    PlayersCount = _networkManager.Players.Count(player => player != null)
+                    ServerName = _gameState.ServerName,
+                    MaxPlayers = _gameState.MaxPlayers,
+                    PlayersCount = _gameState.Players.Count(player => player != null)
                 };
             }
             catch (NotImplementedException)

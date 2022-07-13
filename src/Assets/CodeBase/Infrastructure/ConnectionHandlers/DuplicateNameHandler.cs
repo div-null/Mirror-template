@@ -1,24 +1,26 @@
 ﻿using System.Linq;
-using CodeBase.Model;
-using Game.CodeBase.Services.Network;
 using JetBrains.Annotations;
 using Mirror;
 using Unity.VisualScripting;
+
+using CodeBase.Model;
+using Game.CodeBase.Game;
+using Game.CodeBase.Services.Network;
 
 namespace Game.CodeBase.Infrastructure.ConnectionHandlers
 {
     public sealed class DuplicateNameHandler : IAuthRequestHandler
     {
-        private readonly CustomNetworkManager _networkManager;
+        private readonly GameState _gameState;
 
-        public DuplicateNameHandler(CustomNetworkManager networkManager)
+        public DuplicateNameHandler(GameState gameState)
         {
-            _networkManager = networkManager;
+            _gameState = gameState;
         }
 
         public bool Accept(NetworkConnectionToClient conn, ClientAuthenticator.AuthRequestMessage msg, out ClientAuthenticator.AuthResponseMessage authResponseMessage)
         {
-            int nameDuplicates = _networkManager.Players
+            int nameDuplicates = _gameState.Players
                 .NotNull()
                 .Count(player => player.Username.StartsWith(msg.Username));
 
