@@ -27,38 +27,20 @@ namespace Game.CodeBase.Services.Network
     {
         public long ServerId { get; private set; }
 
-        [Tooltip("Transport to be advertised during discovery")]
-        public Transport transport;
-
-        private string _serverName;
-        private int _maxPlayers;
-        private int _playersCount;
-
         [Tooltip("Invoked when a server is found")]
         public event Action<ServerInfo> OnServerFound;
 
-
-        public void Initialize(string serverName, int playersCount = 1, int maxPlayers = 4)
-        {
-            _playersCount = playersCount;
-            _maxPlayers = maxPlayers;
-            _serverName = serverName;
-        }
-
-        public void UpdatePlayersCount(int playersCount, int maxPlayers = 4)
-        {
-            _playersCount = playersCount;
-            _maxPlayers = maxPlayers;
-        }
-
+        private IServerNotifier _serverNotifier;
+        
         public override void Start()
         {
             ServerId = RandomLong();
-
-            if (transport == null)
-                transport = Transport.activeTransport;
-
             base.Start();
+        }
+
+        public void Initialize(IServerNotifier serverNotifier)
+        {
+            _serverNotifier = serverNotifier;
         }
 
         /// <summary>
@@ -73,24 +55,7 @@ namespace Game.CodeBase.Services.Network
         /// <returns>A message containing information about this server</returns>
         protected override ServerInfo ProcessRequest(DiscoveryRequest request, IPEndPoint endpoint)
         {
-            try
-            {
-                // this is an example reply message,  return your own
-                // to include whatever is relevant for your game
-                return new ServerInfo
-                {
-                    ServerId = ServerId,
-                    Uri = transport.ServerUri(),
-                    ServerName = _serverName,
-                    MaxPlayers = _maxPlayers,
-                    PlayersCount = _playersCount
-                };
-            }
-            catch (NotImplementedException)
-            {
-                Debug.LogError($"Transport {transport} does not support network discovery");
-                throw;
-            }
+            return _serverNotifier.Notify(ServerId, request, endpoint);
         }
 
 

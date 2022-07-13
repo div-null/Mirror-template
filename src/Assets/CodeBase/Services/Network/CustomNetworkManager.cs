@@ -23,6 +23,8 @@ namespace Game.CodeBase.Services.Network
 
         public BasePlayer[] Players { get; } = new BasePlayer[Constants.MaxPlayers];
 
+        public string ServerName { get; private set; } = "Server";
+
         private PlayerFactory _playerFactory;
 
         public event Action OnClientConnected;

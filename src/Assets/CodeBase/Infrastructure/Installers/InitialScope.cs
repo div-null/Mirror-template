@@ -48,6 +48,7 @@ namespace Game.CodeBase.Infrastructure.Installers
 
             builder.Register<AuthRequestProvider>(Lifetime.Singleton).AsImplementedInterfaces();
             builder.Register<DuplicateNameHandler>(Lifetime.Singleton).AsImplementedInterfaces();
+            builder.Register<ServerNotifier>(Lifetime.Singleton).AsImplementedInterfaces();
 
             CustomNetworkManager networkManager = Instantiate(customNetworkManagerPrefab);
 
