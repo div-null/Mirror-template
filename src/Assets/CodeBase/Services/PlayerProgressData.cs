@@ -1,5 +1,5 @@
 ﻿using System;
-using Game.CodeBase.Data;
+using CodeBase.Model;
 using Newtonsoft.Json;
 using UnityEngine;
 

@@ -1,7 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
-using Game.CodeBase.Data;
+using CodeBase.Model;
 using Game.CodeBase.Game;
 using JetBrains.Annotations;
 using Mirror;

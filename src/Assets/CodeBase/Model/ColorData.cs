@@ -3,7 +3,7 @@ using Mirror;
 using Newtonsoft.Json;
 using UnityEngine;
 
-namespace Game.CodeBase.Data
+namespace CodeBase.Model
 {
     [Serializable]
     public class ColorData
