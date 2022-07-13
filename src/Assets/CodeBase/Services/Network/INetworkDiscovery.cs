@@ -1,4 +1,5 @@
 ﻿using System;
+using CodeBase.Shared;
 using Game.CodeBase.Game;
 
 namespace Game.CodeBase.Services.Network
