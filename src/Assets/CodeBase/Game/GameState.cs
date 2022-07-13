@@ -1,5 +1,4 @@
-﻿using System;
-using Mirror;
+﻿using Mirror;
 using UniRx;
 using UnityEngine;
 using Game.CodeBase.Player;
@@ -8,7 +7,7 @@ using Game.CodeBase.Shared;
 
 namespace Game.CodeBase.Game
 {
-    public class GameState : IDisposable
+    public class GameState
     {
         public readonly ReactiveCommand<BasePlayer> AddPlayer = new();
         public readonly IConnectableObservable<BasePlayer> AddPlayerBuffered;
@@ -28,9 +27,9 @@ namespace Game.CodeBase.Game
         {
             _networkManager = networkManager;
             _playerFactory = playerFactory;
+            _networkManager.OnSpawnClient += OnSpawnPlayer;
             AddPlayerBuffered = AddPlayer.Replay(4);
             AddPlayerBuffered.Connect();
-            _networkManager.OnSpawnClient += OnSpawnPlayer;
         }
 
         private void OnSpawnPlayer(NetworkConnectionToClient conn)
@@ -58,12 +57,6 @@ namespace Game.CodeBase.Game
 
             Debug.Log("Its not empty!");
             return -1;
-        }
-
-        public void Dispose()
-        {
-            AddPlayer?.Dispose();
-            _networkManager.OnSpawnClient -= OnSpawnPlayer;
         }
     }
 }

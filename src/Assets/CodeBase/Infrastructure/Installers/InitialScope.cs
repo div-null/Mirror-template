@@ -44,6 +44,7 @@ namespace Game.CodeBase.Infrastructure.Installers
             builder.Register<SceneLoader>(Lifetime.Singleton);
             builder.Register<PlayerProgressData>(Lifetime.Singleton);
             builder.Register<MainInputActions>(Lifetime.Singleton);
+            builder.Register<GameState>(Lifetime.Singleton);
             builder.RegisterEntryPoint<EntryPoint>();
 
             builder.Register<AuthRequestProvider>(Lifetime.Singleton).AsImplementedInterfaces();
