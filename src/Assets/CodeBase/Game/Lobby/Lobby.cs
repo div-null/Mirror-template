@@ -55,7 +55,7 @@ namespace Game.CodeBase.Game.Lobby
         public async void CreatePlayerAsync(BasePlayer player, NetworkConnectionToClient conn = null)
         {
             Debug.Log($"Spawn LobbyPlayer for id={player.Id}");
-            bool isHost = this.HasAuthority(player);
+            bool isHost = conn == null;
             
             LobbyPlayer lobbyPlayer = await _factory.CreatePlayer(conn, player, isHost);
             _players.Add(lobbyPlayer);
