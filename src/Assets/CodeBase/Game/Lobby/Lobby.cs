@@ -3,6 +3,7 @@ using Cysharp.Threading.Tasks;
 using Game.CodeBase.Model;
 using Game.CodeBase.Player;
 using Game.CodeBase.Services;
+using Game.CodeBase.Shared;
 using Game.CodeBase.UI;
 using Mirror;
 using UniRx;
@@ -54,7 +55,7 @@ namespace Game.CodeBase.Game.Lobby
         public async void CreatePlayerAsync(BasePlayer player, NetworkConnectionToClient conn = null)
         {
             Debug.Log($"Spawn LobbyPlayer for id={player.Id}");
-            bool isHost = HasAuthority(player);
+            bool isHost = this.HasAuthority(player);
             
             LobbyPlayer lobbyPlayer = await _factory.CreatePlayer(conn, player, isHost);
             _players.Add(lobbyPlayer);
@@ -66,7 +67,7 @@ namespace Game.CodeBase.Game.Lobby
             Debug.Log("Setup player", player);
             if (player == null) return;
 
-            if (HasAuthority(player))
+            if (this.HasAuthority(player))
             {
                 _localClient = player;
                 _lobbyUI.Username.Subscribe(StoreUsername);
@@ -108,9 +109,5 @@ namespace Game.CodeBase.Game.Lobby
                 }
             }
         }
-
-        private bool HasAuthority(NetworkBehaviour entity) =>
-            connectionToServer?.connectionId == entity.connectionToServer?.connectionId ||
-            connectionToClient?.connectionId == entity.connectionToClient?.connectionId;
     }
 }
