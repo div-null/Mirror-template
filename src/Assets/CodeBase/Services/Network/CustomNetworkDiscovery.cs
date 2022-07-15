@@ -3,6 +3,7 @@ using System.Net;
 using Mirror;
 using Mirror.Discovery;
 using UnityEngine;
+using VContainer;
 
 namespace Game.CodeBase.Services.Network
 {
@@ -38,6 +39,7 @@ namespace Game.CodeBase.Services.Network
             base.Start();
         }
 
+        [Inject]
         public void Initialize(IServerNotifier serverNotifier)
         {
             _serverNotifier = serverNotifier;

@@ -4,10 +4,8 @@ using Game.CodeBase.Infrastructure.ConnectionHandlers;
 using Game.CodeBase.Infrastructure.States;
 using Game.CodeBase.Services;
 using Game.CodeBase.Services.Network;
-
 using Mirror;
 using UnityEngine;
-using UnityEngine.Serialization;
 using VContainer;
 using VContainer.Unity;
 
@@ -15,21 +13,11 @@ namespace Game.CodeBase.Infrastructure.Installers
 {
     public class InitialScope : LifetimeScope
     {
-        [FormerlySerializedAs("_advancedNetworkManagerPrefab"), SerializeField]
-        private CustomNetworkManager customNetworkManagerPrefab;
-
         private class EntryPoint : IStartable
         {
-            private readonly InitialScope _scope;
-
-            public EntryPoint(InitialScope scope)
-            {
-                _scope = scope;
-            }
-
             public void Start()
             {
-                LifetimeScope lifetimeScope = _scope.CreateChild(new GameStateMachineInstaller());
+                LifetimeScope lifetimeScope = Find<InitialScope>().CreateChild(new GameStateMachineInstaller());
 
                 var gameStateMachine = lifetimeScope.Container.Resolve<IGameStateMachine>();
                 var progressData = lifetimeScope.Container.Resolve<PlayerProgressData>();
@@ -40,22 +28,31 @@ namespace Game.CodeBase.Infrastructure.Installers
 
         protected override void Configure(IContainerBuilder builder)
         {
+            LifetimeScope scope = Find<RootScope>();
+            var networkManager = scope.Container.Resolve<CustomNetworkManager>();
+
             builder.Register<ServersObserver>(Lifetime.Singleton);
             builder.Register<SceneLoader>(Lifetime.Singleton);
-            builder.Register<PlayerProgressData>(Lifetime.Singleton);
-            builder.Register<MainInputActions>(Lifetime.Singleton);
             builder.Register<GameState>(Lifetime.Singleton);
-            builder.RegisterEntryPoint<EntryPoint>();
 
-            builder.Register<AuthRequestProvider>(Lifetime.Singleton).AsImplementedInterfaces();
-            builder.Register<DuplicateNameHandler>(Lifetime.Singleton).AsImplementedInterfaces();
-            builder.Register<ServerNotifier>(Lifetime.Singleton).AsImplementedInterfaces();
-
-            CustomNetworkManager networkManager = Instantiate(customNetworkManagerPrefab);
+            RegisterNetworkHandlers(builder);
 
             builder.Register<LobbyFactory>(Lifetime.Singleton);
             builder.Register(_ => new PlayerFactory(networkManager.GetStartPosition(), networkManager.playerPrefab), Lifetime.Singleton);
 
+            RegisterNetworkComponents(builder, networkManager);
+            
+            builder.RegisterEntryPoint<EntryPoint>();
+        }
+
+        private static void RegisterNetworkHandlers(IContainerBuilder builder)
+        {
+            builder.Register<AuthRequestProvider>(Lifetime.Singleton).As<IAuthRequestProvider>();
+            builder.Register<DuplicateNameHandler>(Lifetime.Singleton).As<IAuthRequestHandler>();
+            builder.Register<ServerNotifier>(Lifetime.Singleton).As<IServerNotifier>();
+        }
+
+        private static void RegisterNetworkComponents(IContainerBuilder builder, CustomNetworkManager networkManager) =>
             builder.UseComponents(components =>
             {
                 components.AddInstance(networkManager)
@@ -69,6 +66,5 @@ namespace Game.CodeBase.Infrastructure.Installers
 
                 components.AddInstance(networkManager.GetComponent<ClientAuthenticator>());
             });
-        }
     }
 }

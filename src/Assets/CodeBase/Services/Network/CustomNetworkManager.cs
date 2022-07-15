@@ -39,6 +39,11 @@ namespace Game.CodeBase.Services.Network
             StopHost();
         }
 
+        public override void OnDestroy()
+        {
+            Debug.LogWarning("NetworkManager Destroyed");
+        }
+
         /// <summary>
         /// Called on the client when connected to a server.
         /// <para>The default implementation of this function sets the client as ready and adds a player. Override the function to dictate what happens when the client connects.</para>
