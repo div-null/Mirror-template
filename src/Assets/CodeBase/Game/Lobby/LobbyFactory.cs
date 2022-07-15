@@ -15,13 +15,13 @@ namespace Game.CodeBase.Game.Lobby
         private readonly AsyncLazy<Object> _lobbyUITask = UniTask.Lazy(() => Resources.LoadAsync<Object>(AssetPath.LobbyUI).ToUniTask());
         private readonly AsyncLazy<Object> _lobbyTask = UniTask.Lazy(() => Resources.LoadAsync<Object>(AssetPath.Lobby).ToUniTask());
 
-        public async UniTask<LobbyPlayer> CreatePlayer(NetworkConnection conn, BasePlayer basePlayer, bool isLeader)
+        public async UniTask<LobbyPlayer> CreatePlayer(BasePlayer basePlayer, bool isLeader)
         {
             var playerObj = (GameObject) await _lobbyPlayerTask;
             var lobbyPlayer = Object.Instantiate(playerObj).GetComponent<LobbyPlayer>();
             lobbyPlayer.Initialize(basePlayer, isLeader);
 
-            NetworkServer.Spawn(lobbyPlayer.gameObject, conn);
+            NetworkServer.Spawn(lobbyPlayer.gameObject, basePlayer.gameObject);
             return lobbyPlayer;
         }
 

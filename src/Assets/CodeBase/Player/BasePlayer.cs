@@ -52,13 +52,13 @@ namespace Game.CodeBase.Player
 
         public void SetUsername(string username)
         {
-            if (!isServer) return;
+            if (!isLocalPlayer) return;
             CmdChangeUsername(username);
         }
 
         public void SetColor(Color value)
         {
-            if (!isServer) return;
+            if (!isLocalPlayer) return;
             CmdSetColor(value);
         }
 

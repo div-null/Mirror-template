@@ -52,12 +52,13 @@ namespace Game.CodeBase.Game.Lobby
                 _lobbyUI.SetHostButtons();
         }
 
-        public async void CreatePlayerAsync(BasePlayer player, NetworkConnectionToClient conn = null)
+        public async void CreatePlayerAsync(BasePlayer player)
         {
+            // var client = player.GetComponent<NetworkIdentity>();
             Debug.Log($"Spawn LobbyPlayer for id={player.Id}");
-            bool isHost = conn == null;
+            bool isHost = player.hasAuthority;
             
-            LobbyPlayer lobbyPlayer = await _factory.CreatePlayer(conn, player, isHost);
+            LobbyPlayer lobbyPlayer = await _factory.CreatePlayer(player, isHost);
             _players.Add(lobbyPlayer);
             _netIds.Add(lobbyPlayer.netId);
         }
@@ -67,7 +68,7 @@ namespace Game.CodeBase.Game.Lobby
             Debug.Log("Setup player", player);
             if (player == null) return;
 
-            if (this.HasAuthority(player))
+            if (player.hasAuthority)
             {
                 _localClient = player;
                 _lobbyUI.Username.Subscribe(StoreUsername);
