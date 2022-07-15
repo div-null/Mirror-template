@@ -1,13 +1,12 @@
 {
-    "name": "Game_Services",
+    "name": "Game_Services_Network",
     "rootNamespace": "Game",
     "references": [
-        "GUID:75469ad4d38634e559750d17036d5f7c",
         "GUID:b0214a6008ed146ff8f122a6a9c2f6cc",
         "GUID:30817c1a0e6d646d99c048fc403f5979",
-        "GUID:f51ebe6a0ceec4240a699833d6309b23",
-        "GUID:f538f456c78442c5abce015517e25168",
-        "GUID:f4d8ef366438460681bbde7db764f557"
+        "GUID:72872094b21c16e48b631b2224833d49",
+        "GUID:f4d8ef366438460681bbde7db764f557",
+        "GUID:8315d72923314afdacfb7e5fd6cc8054"
     ],
     "includePlatforms": [],
     "excludePlatforms": [],
