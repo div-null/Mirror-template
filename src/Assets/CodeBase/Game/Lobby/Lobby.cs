@@ -3,6 +3,7 @@ using Cysharp.Threading.Tasks;
 using Game.CodeBase.Model;
 using Game.CodeBase.Player;
 using Game.CodeBase.Services;
+using Game.CodeBase.Services.Network;
 using Game.CodeBase.Shared;
 using Game.CodeBase.UI;
 using Mirror;
@@ -24,6 +25,7 @@ namespace Game.CodeBase.Game.Lobby
         private LobbyPlayer _localClient;
         private LobbyFactory _factory;
         private PlayerProgressData _playerProgressData;
+        private NetworkSpawner _spawner;
 
         private void Awake()
         {
@@ -36,20 +38,25 @@ namespace Game.CodeBase.Game.Lobby
         {
             base.OnStartClient();
             Spawned?.Invoke(this);
-
-            foreach (var id in _netIds)
-                StartCoroutine(AwaitLobbyPlayer(id).ToCoroutine());
         }
 
-        public void Initialize(LobbyFactory factory, LobbyUI lobbyUI, PlayerProgressData playerProgressData)
+        public void Initialize(LobbyFactory factory, LobbyUI lobbyUI, PlayerProgressData playerProgressData, NetworkSpawner spawner)
         {
+            _spawner = spawner;
             _playerProgressData = playerProgressData;
             _factory = factory;
             _lobbyUI = lobbyUI;
             AddPlayerBuffered.Subscribe(SetupPlayer);
 
             if (isServer)
+            {
                 _lobbyUI.SetHostButtons();
+            }
+            else
+            {
+                foreach (var id in _netIds)
+                    StartCoroutine(GetPlayerAsync(id).ToCoroutine());
+            }
         }
 
         public async void CreatePlayerAsync(BasePlayer player)
@@ -57,7 +64,7 @@ namespace Game.CodeBase.Game.Lobby
             // var client = player.GetComponent<NetworkIdentity>();
             Debug.Log($"Spawn LobbyPlayer for id={player.Id}");
             bool isHost = player.hasAuthority;
-            
+
             LobbyPlayer lobbyPlayer = await _factory.CreatePlayer(player, isHost);
             _players.Add(lobbyPlayer);
             _netIds.Add(lobbyPlayer.netId);
@@ -80,6 +87,15 @@ namespace Game.CodeBase.Game.Lobby
             _lobbyUI.SetupSlot(player);
         }
 
+        private async UniTask GetPlayerAsync(uint id)
+        {
+            var lobbyPlayer = await _spawner.AwaitForNetworkEntity<LobbyPlayer>(id, TimeSpan.FromSeconds(3));
+            if (lobbyPlayer != null)
+                AddPlayer.Execute(lobbyPlayer);
+            else
+                Debug.LogError($"LobbyPlayer (netId={id}) could not be loaded");
+        }
+
         private void StoreUsername(string value)
         {
             PlayerProgress progress = _playerProgressData.Progress;
@@ -93,21 +109,6 @@ namespace Game.CodeBase.Game.Lobby
             if (op == SyncList<LobbyPlayer>.Operation.OP_ADD)
             {
                 AddPlayer.Execute(player);
-            }
-        }
-
-        private async UniTask AwaitLobbyPlayer(uint id)
-        {
-            Debug.Log($"Awaiting for player netid={id}");
-            while (true)
-            {
-                await UniTask.NextFrame();
-                if (NetworkClient.spawned.TryGetValue(id, out NetworkIdentity identity))
-                {
-                    var lobbyPlayer = identity.gameObject.GetComponent<LobbyPlayer>();
-                    AddPlayer.Execute(lobbyPlayer);
-                    break;
-                }
             }
         }
     }

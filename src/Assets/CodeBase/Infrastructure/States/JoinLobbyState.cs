@@ -17,9 +17,11 @@ namespace Game.CodeBase.Infrastructure.States
         private Lobby _lobby;
         private LobbyUI _lobbyUI;
         private IObservable<Lobby> _networkingSynced;
+        private NetworkSpawner _spawner;
 
-        public JoinLobbyState(LobbyFactory lobbyFactory, CustomNetworkManager networkManager, PlayerProgressData playerProgressData)
+        public JoinLobbyState(LobbyFactory lobbyFactory, CustomNetworkManager networkManager, PlayerProgressData playerProgressData, NetworkSpawner spawner)
         {
+            _spawner = spawner;
             _playerProgressData = playerProgressData;
             _lobbyFactory = lobbyFactory;
             _networkManager = networkManager;
@@ -46,7 +48,7 @@ namespace Game.CodeBase.Infrastructure.States
         {
             _lobbyUI = await _lobbyFactory.CreateUI();
             _lobby = lobby;
-            _lobby.Initialize(_lobbyFactory, _lobbyUI, _playerProgressData);
+            _lobby.Initialize(_lobbyFactory, _lobbyUI, _playerProgressData, _spawner);
         }
     }
 }

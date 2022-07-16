@@ -34,6 +34,7 @@ namespace Game.CodeBase.Infrastructure.Installers
             builder.Register<ServersObserver>(Lifetime.Singleton);
             builder.Register<SceneLoader>(Lifetime.Singleton);
             builder.Register<GameState>(Lifetime.Singleton);
+            builder.Register<NetworkSpawner>(Lifetime.Singleton);
 
             RegisterNetworkHandlers(builder);
 

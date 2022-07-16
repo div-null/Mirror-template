@@ -1,7 +1,6 @@
 ﻿using System.Threading.Tasks;
 using kcp2k;
 using UniRx;
-
 using Game.CodeBase.Game;
 using Game.CodeBase.Game.Lobby;
 using Game.CodeBase.Player;
@@ -20,13 +19,16 @@ namespace Game.CodeBase.Infrastructure.States
 
         private Lobby _lobby;
         private CompositeDisposable _disposable;
+        private NetworkSpawner _spawner;
 
-        public HostLobbyState(LobbyFactory lobbyFactory, 
+        public HostLobbyState(LobbyFactory lobbyFactory,
             ServersObserver serversObserver,
             CustomNetworkManager networkManager,
+            NetworkSpawner spawner,
             GameState gameState,
             PlayerProgressData playerProgressData)
         {
+            _spawner = spawner;
             _gameState = gameState;
             _playerProgressData = playerProgressData;
             _networkManager = networkManager;
@@ -60,7 +62,7 @@ namespace Game.CodeBase.Infrastructure.States
         {
             var lobbyUI = await _lobbyFactory.CreateUI();
             _lobby = await _lobbyFactory.SpawnLobby();
-            _lobby.Initialize(_lobbyFactory, lobbyUI, _playerProgressData);
+            _lobby.Initialize(_lobbyFactory, lobbyUI, _playerProgressData, _spawner);
             _gameState.AddPlayerBuffered.Subscribe(OnAddPlayer).AddTo(_disposable);
         }
     }
