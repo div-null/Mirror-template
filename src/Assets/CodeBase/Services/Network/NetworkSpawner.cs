@@ -7,10 +7,21 @@ using UnityEngine;
 
 namespace Game.CodeBase.Services.Network
 {
-    public class NetworkSpawner : NetworkBehaviour
+    public class NetworkSpawner
     {
-        private readonly SyncList<uint> _despawned = new SyncList<uint>();
-        readonly TimeoutController _timeoutController = new TimeoutController();
+        private readonly List<uint> _deSpawned = new List<uint>();
+        private readonly TimeoutController _timeoutController = new TimeoutController();
+        private bool _isServer;
+
+        public NetworkSpawner()
+        {
+            NetworkClient.RegisterHandler<ObjectDestroyMessage>(HandleResponse);
+        }
+
+        private void HandleResponse(ObjectDestroyMessage msg)
+        {
+            _deSpawned.Add(msg.netId);
+        }
 
         public void Spawn(GameObject obj, GameObject ownerPlayer)
         {
@@ -27,7 +38,7 @@ namespace Game.CodeBase.Services.Network
         public void UnSpawn(GameObject obj)
         {
             var identity = obj.GetComponent<NetworkIdentity>();
-            _despawned.Add(identity.netId);
+            // _deSpawned.Add(identity.netId);
             NetworkServer.UnSpawn(obj);
         }
 
@@ -39,7 +50,7 @@ namespace Game.CodeBase.Services.Network
 
         private async UniTask<TEntity> PullNetworkEntity<TEntity>(uint netId, CancellationToken cancellationToken) where TEntity : NetworkBehaviour
         {
-            if (_despawned.Contains(netId))
+            if (_deSpawned.Contains(netId))
                 return null;
 
             if (NetworkClient.isHostClient)
