@@ -11,7 +11,6 @@ namespace Game.CodeBase.Services.Network
     {
         private readonly List<uint> _deSpawned = new List<uint>();
         private readonly TimeoutController _timeoutController = new TimeoutController();
-        private bool _isServer;
 
         public NetworkSpawner()
         {
@@ -51,36 +50,51 @@ namespace Game.CodeBase.Services.Network
         private async UniTask<TEntity> PullNetworkEntity<TEntity>(uint netId, CancellationToken cancellationToken) where TEntity : NetworkBehaviour
         {
             if (_deSpawned.Contains(netId))
+            {
+                Debug.LogWarning("Cannot access despawned object");
                 return null;
+            }
 
             if (NetworkClient.isHostClient)
-                return await TryGetComponent<TEntity>(netId, NetworkServer.spawned);
+                return TryGetComponent<TEntity>(netId, NetworkServer.spawned);
 
-            while (!cancellationToken.IsCancellationRequested)
+            try
             {
-                await UniTask.NextFrame(cancellationToken);
+                while (!cancellationToken.IsCancellationRequested)
+                {
+                    await UniTask.NextFrame(cancellationToken);
 
-                var component = await TryGetComponent<TEntity>(netId, NetworkClient.spawned);
-                if (component != null)
-                    return component;
+                    var component = TryGetComponent<TEntity>(netId, NetworkClient.spawned);
+                    if (component != null)
+                        return component;
+                }
+            }
+            catch (NullReferenceException e)
+            {
+                Debug.LogException(e);
             }
 
             return null;
         }
 
-        private static async UniTask<TEntity> TryGetComponent<TEntity>(uint netId, Dictionary<uint, NetworkIdentity> networkIdentities) where TEntity : NetworkBehaviour
+        private static TEntity TryGetComponent<TEntity>(uint netId, Dictionary<uint, NetworkIdentity> networkIdentities) where TEntity : NetworkBehaviour
         {
             if (networkIdentities.TryGetValue(netId, out NetworkIdentity identity))
             {
                 var entity = identity.gameObject.GetComponent<TEntity>();
                 if (entity == null)
-                    await UniTask.FromException<NullReferenceException>(
-                        new NullReferenceException($"Entity of type ({nameof(TEntity)}) is missing on object (netId={netId})"));
+                    throw new NullReferenceException($"Entity of type ({nameof(TEntity)}) is missing on object (netId={netId})");
 
                 return entity;
             }
 
             return null;
         }
+
+        // public void Dispose()
+        // {
+        //     _timeoutController?.Dispose();
+        //     NetworkClient.UnregisterHandler<ObjectDestroyMessage>();
+        // }
     }
 }
